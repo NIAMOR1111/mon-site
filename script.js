@@ -226,21 +226,6 @@ function hideTransmission (){
     })
 }
 
-document.getElementById('relevesButton').addEventListener('click', async function () {
-    try {
-        console.log('Tentative de chargement du fichier...');
-        const response = await fetch('transmission-releves.html');
-        console.log('Réponse reçue :', response);
-
-        if (!response.ok) throw new Error(`Erreur HTTP : ${response.status}`);
-
-        const html = await response.text();
-        console.log('Contenu du fichier HTML chargé avec succès :', html);
-        document.getElementById('textBoxDisplay').innerHTML = html;
-        document.getElementById('textBoxDisplay').classList.remove('hidden');
-    } catch (error) {
-        console.error('Erreur lors du chargement du fichier :', error);
-        document.getElementById('textBoxDisplay').innerHTML = `<div class="error-message">Erreur lors du chargement du contenu.</div>`;
-    }
-    document.getElementById('textBoxDisplay').classList.remove('hidden');
-});
+fetch('transmission_releves.html')
+    .then(response => response.text())
+    .then(html => document.getElementById('contenu').innerHTML = html);
