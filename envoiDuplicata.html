@@ -1,0 +1,184 @@
+    <style>
+        #formContainer {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .column {
+            width: 45%;
+        }
+        .inputContainer {
+            margin: 15px 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .alert {
+            color: red;
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            border: 1px solid red;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #ffe6e6;
+            text-align: center;
+        }
+        .documentEntry {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+            align-items: center;
+        }
+        .documentEntry button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            font-size: 14px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .documentEntry button:hover {
+            background-color: #a71d2a;
+        }
+    </style>
+<body>
+    <br>
+    <div class="alert">Merci de faire une RGPD complète pour l'envoi de documents.</div>
+
+    <div id="formContainer">
+        <!-- Colonne de gauche -->
+        <div class="column" id="leftColumn">
+            <div class="inputContainer">
+                <label for="documentType">Type de document :</label>
+                <select id="documentType">
+                    <option value="Facture">Facture</option>
+                    <option value="Echeancier">Échéancier</option>
+                    <option value="PlanApurement">Plan d'apurement</option>
+                    <option value="PropositionCommerciale">Proposition commerciale</option>
+                    <option value="Autre">Autre</option>
+                </select>
+                <input type="text" id="otherDocumentType" placeholder="Précisez le type de document" style="display: none; margin-top: 10px;">
+            </div>
+
+            <div class="inputContainer">
+                <label for="documentDate">Date d'édition :</label>
+                <input type="date" id="documentDate">
+            </div>
+
+            <div class="inputContainer">
+                <label>Mode d'envoi :</label>
+                <label><input type="radio" name="sendMode" value="Email" checked> Email</label>
+                <label><input type="radio" name="sendMode" value="Papier"> Papier</label>
+            </div>
+
+            <button id="addDocumentBtn">Enregistrer</button>
+        </div>
+
+        <!-- Colonne de droite -->
+        <div class="column" id="rightColumn">
+            <h3>Documents enregistrés :</h3>
+            <div id="documentList"></div>
+        </div>
+    </div>
+
+    <script>
+        // Gestion de l'affichage du champ "Autre"
+        document.getElementById("documentType").addEventListener("change", function () {
+            const otherField = document.getElementById("otherDocumentType");
+            if (this.value === "Autre") {
+                otherField.style.display = "block";
+            } else {
+                otherField.style.display = "none";
+                otherField.value = ""; // Réinitialiser le champ
+            }
+        });
+
+        // Ajouter un document
+        document.getElementById("addDocumentBtn").addEventListener("click", function () {
+            const documentTypeSelect = document.getElementById("documentType");
+            let documentType = documentTypeSelect.value;
+            const otherDocumentType = document.getElementById("otherDocumentType").value.trim();
+
+            if (documentType === "Autre" && otherDocumentType) {
+                documentType = otherDocumentType;
+            }
+
+            const documentDate = document.getElementById("documentDate").value;
+            const sendMode = document.querySelector("input[name='sendMode']:checked").value;
+
+            if (!documentType || !documentDate) {
+                alert("Veuillez remplir tous les champs.");
+                return;
+            }
+
+            const documentList = document.getElementById("documentList");
+
+            // Créer une nouvelle entrée de document
+            const documentEntry = document.createElement("div");
+            documentEntry.classList.add("documentEntry");
+
+            const documentText = document.createElement("span");
+            documentText.textContent = `${documentType} du ${new Date(documentDate).toLocaleDateString('fr-FR')} (${sendMode})`;
+
+            const deleteBtn = document.createElement("button");
+            deleteBtn.textContent = "Supprimer";
+            deleteBtn.addEventListener("click", function () {
+                documentList.removeChild(documentEntry);
+            });
+
+            documentEntry.appendChild(documentText);
+            documentEntry.appendChild(deleteBtn);
+            documentList.appendChild(documentEntry);
+        });
+
+        // Générer le traçage avec le bouton ValiderTracage
+        document.getElementById("validerTracage").addEventListener("click", function () {
+            const documentList = document.getElementById("documentList");
+            const traceContainer = document.getElementById("tracageDisplay");
+
+            // Réinitialiser le contenu de tracageDisplay
+            traceContainer.innerHTML = "";
+            traceContainer.classList.remove("hidden");
+
+            const tracages = [];
+
+            const documentEntries = documentList.querySelectorAll(".documentEntry span");
+
+            documentEntries.forEach(entry => {
+                tracages.push(entry.textContent);
+            });
+
+            if (tracages.length > 0) {
+                const paragraph = document.createElement("p");
+                paragraph.textContent = `J'ai envoyé un duplicata pour : ${tracages.join(", ")}`;
+                traceContainer.appendChild(paragraph);
+            } else {
+                const emptyMessage = document.createElement("p");
+                emptyMessage.textContent = "Aucune donnée enregistrée.";
+                traceContainer.appendChild(emptyMessage);
+            }
+        });
+    </script>
+</body>
+</html>

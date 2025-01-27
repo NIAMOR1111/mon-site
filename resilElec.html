@@ -1,0 +1,161 @@
+<style>
+    body {
+        font-family: Arial, sans-serif;
+    }
+    #formContainer {
+    display: flex;
+    justify-content: space-between; /* Espacement uniforme entre les colonnes */
+    gap: 20px; /* Espace horizontal entre les colonnes */
+    flex-wrap: nowrap; /* Empêche les colonnes de passer sur une nouvelle ligne */
+    overflow-x: auto; /* Ajoute une barre de défilement horizontale si nécessaire */
+}
+
+.contractSection {
+    flex: 1 0 calc(50% - 10px); /* Chaque section prend 50% de la largeur moins la moitié de l'espacement */
+    box-sizing: border-box; /* Inclut le padding et la bordure dans la largeur totale */
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+}
+    .inputGroup {
+        margin: 10px 0;
+        display: flex;
+        align-items: center;
+    }
+    .inputGroup label {
+        margin-right: 10px;
+    }
+
+    .inputGroup .extraMessage {
+        margin-left: 10px;
+        color: red;
+        font-size: 0.9em;
+        display: none;
+    }
+
+</style>
+</head>
+<div id="formContainer">
+    <!-- Résiliation Électricité -->
+    <div class="contractSection" id="electricitySection">
+        <h3>Résiliation du contrat d'Électricité</h3>
+        <div class="inputGroup">
+            <label for="electricityDatePicker">Date de résiliation :</label>
+            <input type="date" id="electricityDatePicker" name="electricityDate">
+        </div>
+        <div class="inputGroup">
+            <input type="radio" id="electricityRdvOption" name="electricityResiliationType" value="rdv">
+            <label for="electricityRdvOption">Avec rendez-vous distributeur</label>
+            <span class="extraMessage" id="electricityIndexMessage">Pensez à enregistrer un relevé d'index</span>
+        </div>
+        <div class="inputGroup">
+            <input type="radio" id="electricityTeleOption" name="electricityResiliationType" value="tele">
+            <label for="electricityTeleOption">Par téléopération</label>
+        </div>
+        <div class="inputGroup">
+            <input type="radio" id="electricityAutreOption" name="electricityResiliationType" value="autre">
+            <label for="electricityAutreOption">Autre :</label>
+            <input type="text" id="electricityAutreComment" placeholder="Précisez ici">
+        </div>
+    </div>
+
+    <script>
+        /**
+         * Formate une date au format ISO (YYYY-MM-DD) en français
+         * @param {string} isoDate - La date au format ISO (YYYY-MM-DD)
+         * @returns {string} - La date formatée en français
+         */
+        function formatDateInFrench(isoDate) {
+            if (!isoDate) return "Date non spécifiée";
+    
+            const options = { year: "numeric", month: "long", day: "numeric" };
+            const date = new Date(isoDate);
+    
+            if (isNaN(date)) return "Format de date invalide";
+    
+            return date.toLocaleDateString("fr-FR", options);
+        }
+    
+        /**
+         * Gère le traçage pour un contrat spécifique
+         * @param {string} contractType - Le type de contrat ("electricity" ou "gas")
+         * @param {string} date - La date choisie
+         * @param {string} type - Le type de résiliation ("rdv", "tele", ou "autre")
+         * @param {string} autreComment - Le commentaire pour "autre" (facultatif)
+         * @returns {string} - Le traçage généré
+         */
+        function getResiliationTrace(contractType, date, type, autreComment) {
+            const formattedDate = formatDateInFrench(date);
+            const contract = contractType === "electricity" ? "d'électricité" : "de gaz";
+    
+            switch (type) {
+                case "rdv":
+                    return `J'ai programmé un RDV pour la résiliation du contrat ${contract} au ${formattedDate}.`;
+                case "tele":
+                    return `J'ai lancé la résiliation du contrat ${contract} par téléopération au ${formattedDate}.`;
+                case "autre":
+                    return `Le client a demandé une résiliation du contrat ${contract} le ${formattedDate} mais ${autreComment}.`;
+                default:
+                    return `Aucune méthode de résiliation spécifiée pour le contrat ${contract}.`;
+            }
+        }
+    
+        // Fonction pour afficher ou masquer les messages rouges
+        function toggleIndexMessage(contractType, show) {
+            const messageElement = document.getElementById(`${contractType}IndexMessage`);
+            messageElement.style.display = show ? "inline" : "none";
+        }
+    
+        // Gestion des événements sur les options radio
+        ["electricity", "gas"].forEach(contractType => {
+            document
+                .querySelectorAll(`input[name="${contractType}ResiliationType"]`)
+                .forEach(option => {
+                    option.addEventListener("change", () => {
+                        if (option.value === "rdv") {
+                            toggleIndexMessage(contractType, true); // Affiche le message rouge
+                        } else {
+                            toggleIndexMessage(contractType, false); // Masque le message rouge
+                        }
+                    });
+                });
+        });
+    
+        // Gestion du clic sur "Valider"
+        document.getElementById("validerTracage").addEventListener("click", function () {
+            const traceContainer = document.getElementById("tracageDisplay");
+            traceContainer.innerHTML = ""; // Réinitialise le contenu
+            traceContainer.classList.remove("hidden");
+    
+            ["electricity", "gas"].forEach(contractType => {
+                const date = document.getElementById(`${contractType}DatePicker`).value.trim();
+                const rdvOption = document.getElementById(`${contractType}RdvOption`).checked;
+                const teleOption = document.getElementById(`${contractType}TeleOption`).checked;
+                const autreOption = document.getElementById(`${contractType}AutreOption`).checked;
+                const autreComment = document.getElementById(`${contractType}AutreComment`).value.trim();
+    
+                const resiliationType = rdvOption
+                    ? "rdv"
+                    : teleOption
+                    ? "tele"
+                    : autreOption
+                    ? "autre"
+                    : null;
+    
+                if (!date || !resiliationType || (resiliationType === "autre" && !autreComment)) {
+                    const errorMessage = document.createElement("p");
+                    errorMessage.textContent = `Veuillez compléter toutes les informations pour le contrat ${contractType}.`;
+                    traceContainer.appendChild(errorMessage);
+                    return;
+                }
+    
+                const traceMessage = getResiliationTrace(contractType, date, resiliationType, autreComment);
+                const paragraph = document.createElement("p");
+                paragraph.textContent = traceMessage;
+                traceContainer.appendChild(paragraph);
+            });
+        });
+    </script>
+  
+</body>
+</html>

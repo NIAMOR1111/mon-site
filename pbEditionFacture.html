@@ -1,0 +1,52 @@
+<input type="radio" id="factureNonRecue" name="motif" value="factureNonRecue">
+<label for="factureNonRecue">Facture non reçue</label>
+<br>
+<input type="radio" id="factureNonEditee" name="motif" value="factureNonEditee">
+<label for="factureNonEditee">Problème d'édition de facture</label>
+<br>
+<input type="radio" id="factureMultiple" name="motif" value="factureMultiple">
+<label for="factureMultiple">Facture multiple</label>
+<br><br>
+<div id="champDate">
+<label for="dateFacture">Date d'édition de la facture :</label>
+<input type="date" id="dateFacture" name="dateFacture" value="today">
+</div>
+
+<script>
+    // Obtenir la date d'aujourd'hui
+    const today = new Date();
+    const isoDate = today.toISOString().split('T')[0];
+    document.getElementById('dateFacture').value = isoDate;
+
+    // Gestion des phrases associées
+    const phrases = {
+        factureNonRecue: "Le client n'a pas reçu la facture du ",
+        factureMultiple: "Le client indique avoir reçu plusieurs fois la facture du ",
+        factureNonEditee: "Le client n'a toujours pas eu de facture éditée à la date du ",
+    };
+
+    const radios = document.querySelectorAll('input[name="motif"]');
+    const dateInput = document.getElementById('dateFacture');
+    const traceContainer = document.getElementById("tracageDisplay");
+
+    // Bouton de validation
+    const validerButton = document.getElementById("validerTracage");
+
+    validerButton.addEventListener("click", function () {
+        const selectedMotif = document.querySelector('input[name="motif"]:checked');
+        const selectedDate = dateInput.value;
+
+        if (selectedMotif && selectedDate) {
+            // Construire la phrase de traçage
+            const tracage = phrases[selectedMotif.value] + selectedDate + ".";
+
+            // Ajouter le tracage dans le conteneur
+            const paragraph = document.createElement("p");
+            paragraph.textContent = tracage;
+            traceContainer.appendChild(paragraph);
+        } else {
+            // Si aucun motif ou date n'est sélectionné
+            alert("Veuillez sélectionner un motif et une date.");
+        }
+    });
+</script>

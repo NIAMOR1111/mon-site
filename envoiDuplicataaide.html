@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Détail au survol</title>
+    <style>
+        .tooltip-container {
+            display: inline-block;
+            position: relative;
+            text-decoration: underline dotted;
+            cursor: pointer;
+        }
+
+        .tooltip-content {
+            display: none;
+            position: absolute;
+            bottom: 120%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #222;
+            color: #fff;
+            padding: 10px;
+            font-size: 0.9em;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            white-space: nowrap;
+            z-index: 10;
+        }
+
+        .tooltip-container:hover .tooltip-content {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <p>Pour envoyer un duplicata de facture, je clique sur "gérer les contrats" dans SIMM. Ensuite sur le bouton "traiter les postes". Et là je fais "lancer action". Je sélectionne "gestion de contrat" et "envoi de duplicata". Je n'oublie pas de joindre les pièces jointes et de spécifier le <span class="tooltip-container">mode d'envoi
+            <span class="tooltip-content">email ou courrier</span>
+        </span> du duplicata.
+    </p>
+</body>
+
+</html>
