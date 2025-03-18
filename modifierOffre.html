@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Changement d'Offre</title>
+    <style>
+        .hidden { display: none; }
+        .alert { color: red; font-weight: bold; border: 1px solid red; padding: 10px; background-color: #ffe6e6; text-align: center; margin-top: 10px; }
+        .button { background-color: #007BFF; color: white; padding: 10px; cursor: pointer; border: none; }
+        .button:hover { background-color: #0056b3; }
+        .entry { background-color: #f1f1f1; padding: 10px; margin-top: 10px; border-radius: 5px; display: flex; justify-content: space-between; align-items: center; }
+    </style>
+</head>
+<body>
+    <h3>Changement d'Offre</h3>
+
+    <!-- Univers d'offres -->
+    <div id="offerCategorySection">
+        <label>Offre actuelle :</label>
+        <select id="currentOfferCategory">
+            <option value="">Sélectionner...</option>
+            <option value="TRV">TRV</option>
+            <option value="OM">OM</option>
+        </select>
+        
+        <label>Nouvelle offre :</label>
+        <select id="newOfferCategory">
+            <option value="">Sélectionner...</option>
+            <option value="TRV">TRV</option>
+            <option value="OM">OM</option>
+        </select>
+    </div>
+
+    <!-- Alerte -->
+    <div id="alertContainer" class="hidden alert"></div>
+
+    <!-- Types d'offres -->
+    <div id="offerSelection" class="hidden">
+        <label>Type d'offre actuelle :</label>
+        <select id="currentOffer">
+            <option value="">Sélectionner...</option>
+        </select>
+        
+        <label>Nouvelle offre souhaitée :</label>
+        <select id="newOffer">
+            <option value="">Sélectionner...</option>
+        </select>
+    </div>
+
+    <!-- Section de la case à cocher -->
+    <div id="serviceTransferOption" class="hidden">
+        <label><input type="checkbox" id="transferService"> Je transfère à la mise en service.</label>
+    </div>
+
+    <div id="trainingOption" class="hidden">
+        <label><input type="checkbox" id="datCheck"> Je ne suis pas formé facture-conseil, je fais une DAT à 7 jours.</label>
+    </div>
+
+    <script>
+      const offerTypes = {
+    "TRV": ["Base", "Heures creuses heures pleines", "Tempo"],
+    "OM": ["Vert électrique", "Vert électrique auto", "Vert électrique week-end", "Vert électrique régional", "Zen week-end", "Zen week-end plus", "Zen fixe", "Zen flex", "Zen Online"]
+};
+
+document.getElementById("newOfferCategory").addEventListener("change", validateOfferUnivers);
+document.getElementById("currentOfferCategory").addEventListener("change", validateOfferUnivers);
+document.getElementById("validerTracage").addEventListener("click", generateTracage);
+
+function validateOfferUnivers() {
+    const currentCategory = document.getElementById("currentOfferCategory").value;
+    const newCategory = document.getElementById("newOfferCategory").value;
+    const alertContainer = document.getElementById("alertContainer");
+    const offerSelection = document.getElementById("offerSelection");
+    const serviceTransferOption = document.getElementById("serviceTransferOption");
+    const trainingOption = document.getElementById("trainingOption");
+    const transferService = document.getElementById("transferService");
+    const datCheck = document.getElementById("datCheck");
+
+    // Réinitialiser les cases à cocher
+    transferService.checked = false;
+    datCheck.checked = false;
+
+    // Cacher toutes les sections par défaut
+    alertContainer.classList.add("hidden");
+    offerSelection.classList.add("hidden");
+    serviceTransferOption.classList.add("hidden");
+    trainingOption.classList.add("hidden");
+
+    if (!currentCategory || !newCategory) return;
+
+    if (currentCategory !== newCategory) {
+        // Si les univers sont différents : Afficher message d'alerte et mise en service
+        alertContainer.textContent = "Le client souhaite souscrire à une offre d'un autre univers, je l'oriente vers la mise en service.";
+        alertContainer.classList.remove("hidden");
+        serviceTransferOption.classList.remove("hidden");
+
+        // Cacher la sélection des types d'offres
+        offerSelection.classList.add("hidden");
+    } else {
+        // Si les univers sont identiques, afficher les types d'offres
+        offerSelection.classList.remove("hidden");
+        populateOffers("currentOffer", offerTypes[currentCategory]);
+        populateOffers("newOffer", offerTypes[newCategory]);
+
+        // Réinitialiser les cases à cocher (utile si on repasse d'un univers différent à identique)
+        transferService.checked = false;
+        datCheck.checked = false;
+
+        // Gérer le changement de type d'offre
+        document.getElementById("currentOffer").addEventListener("change", checkOfferTypes);
+        document.getElementById("newOffer").addEventListener("change", checkOfferTypes);
+    }
+}
+
+function populateOffers(selectId, offers) {
+    const selectElement = document.getElementById(selectId);
+    selectElement.innerHTML = "<option value=''>Sélectionner...</option>";
+    offers.forEach(offer => {
+        let option = document.createElement("option");
+        option.value = offer;
+        option.textContent = offer;
+        selectElement.appendChild(option);
+    });
+    selectElement.disabled = false; // Activer le menu déroulant
+}
+
+function checkOfferTypes() {
+    const currentOffer = document.getElementById("currentOffer").value;
+    const newOffer = document.getElementById("newOffer").value;
+    const serviceTransferOption = document.getElementById("serviceTransferOption");
+    const trainingOption = document.getElementById("trainingOption");
+    const transferService = document.getElementById("transferService");
+    const datCheck = document.getElementById("datCheck");
+
+    // Réinitialiser les cases à cocher à chaque changement d'offre
+    transferService.checked = false;
+    datCheck.checked = false;
+
+    // Masquer les options par défaut
+    serviceTransferOption.classList.add("hidden");
+    trainingOption.classList.add("hidden");
+
+    if (currentOffer && newOffer) {
+        if (currentOffer === newOffer) {
+            serviceTransferOption.classList.remove("hidden");
+        } else {
+            trainingOption.classList.remove("hidden");
+        }
+    }
+}
+
+function generateTracage() {
+    const currentCategory = document.getElementById("currentOfferCategory").value;
+    const newCategory = document.getElementById("newOfferCategory").value;
+    const currentOffer = document.getElementById("currentOffer").value;
+    const newOffer = document.getElementById("newOffer").value;
+    const transferChecked = document.getElementById("transferService").checked;
+    const datChecked = document.getElementById("datCheck").checked;
+    let tracageText = "";
+
+    if (currentCategory !== newCategory) {
+        tracageText = `Le client souhaite souscrire à une offre d'un autre univers. `;
+        tracageText += transferChecked ? `Je le transfère à la mise en service (${newCategory}).` : "Je l'invite à recontacter le 3404.";
+    } else if (currentOffer === newOffer) {
+        tracageText = `Le client souhaite souscrire à la même offre. `;
+        tracageText += transferChecked ? `Je le transfère à la mise en service (${newCategory}).` : "Je l'invite à recontacter le 3404.";
+    } else {
+        tracageText = datChecked ? `Le client souhaite passer de ${currentOffer} à ${newOffer}.` : `Le client est passé de ${currentOffer} à ${newOffer}.`;
+    }
+
+    if (datChecked) {
+        tracageText += " Je fais une DAT.";
+    }
+
+    document.getElementById("tracageDisplay").textContent = tracageText;
+    document.getElementById("tracageDisplay").classList.remove('hidden');
+}
+
+    </script>
+    

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu déroulant et Index</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        #formContainer {
+            margin: 20px;
+        }
+        .inputContainer {
+            margin: 10px 0;
+        }
+        label {
+            margin-right: 10px;
+        }
+        #traceContainer {
+            margin-top: 20px;
+            padding: 10px;
+            border-top: 1px solid #ccc;
+        }
+        #validateBtn {
+            margin-top: 10px;
+            display: block;
+        }
+    </style>
+</head>
+<body>  
+    <div id="formContainer">
+        <!-- Menu déroulant -->
+        <label for="optionsIndex">Choisissez une option :</label>
+        <select id="optionsIndex">
+            <option value="Base">Base</option>
+            <option value="HeuresCreuses">Heures creuses</option>
+            <option value="HeuresPleines">Heures pleines</option>
+            <option value="JoursSemaineHC">Jours semaine heures creuses</option>
+            <option value="JoursSemaineHP">Jours semaine heures pleines</option>
+            <option value="JoursWeekendHC">Jours week-end heures creuses</option>
+            <option value="JoursWeekendHP">Jours week-end heures pleines</option>
+            <option value="JoursBleusHC">Jours bleus heures creuses</option>
+            <option value="JoursBleusHP">Jours bleus heures pleines</option>
+            <option value="JoursBlancsHC">Jours blancs heures creuses</option>
+            <option value="JoursBlancsHP">Jours blancs heures pleines</option>
+            <option value="JoursRougesHC">Jours rouges heures creuses</option>
+            <option value="JoursRougesHP">Jours rouges heures pleines</option>
+        </select>
+        <button id="addIndexBtn">Ajouter Index</button>
+
+        <!-- Conteneur pour afficher les champs ajoutés -->
+        <div id="indexContainer"></div>
+    </div>
+
+    <script>
+        // Ajouter un nouvel index
+        document.getElementById("addIndexBtn").addEventListener("click", function () {
+            const selectedOption = document.getElementById("optionsIndex").value;
+            const indexContainer = document.getElementById("indexContainer");
+
+            // Générer un ID unique basé sur la sélection
+            const inputId = `Index${selectedOption}`;
+
+            // Vérifier si l'index existe déjà
+            if (document.getElementById(inputId)) {
+                alert("Cet index a déjà été ajouté.");
+                return;
+            }
+
+            // Créer un conteneur pour le nouvel index
+            const inputContainer = document.createElement("div");
+            inputContainer.classList.add("inputContainer");
+
+            // Ajouter un label pour le champ
+            const label = document.createElement("label");
+            label.textContent = `Index ${selectedOption.replace(/([A-Z])/g, " $1").trim()}:`;
+
+            // Ajouter un champ de saisie
+            const input = document.createElement("input");
+            input.type = "text";
+            input.placeholder = "ex : 5123";
+            input.id = inputId;
+
+            // Ajouter le tout au conteneur principal
+            inputContainer.appendChild(label);
+            inputContainer.appendChild(input);
+            indexContainer.appendChild(inputContainer);
+        });
+    </script>
+</body>
+</html>

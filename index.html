@@ -52,8 +52,8 @@
     <div class="step" data-step="2">
         <h2>Motif d'appel :</h2>
         <div class="btnGroup">
-            <button class="btn" onclick="changeColor(this, 2)">Demande</button>
-            <button class="btn" onclick="changeColor(this, 2)">Réclamation</button>
+            <button class="btn typeTracage" onclick="changeColor(this, 2)" data-tracage="">Demande</button>
+            <button class="btn typeTracage" onclick="changeColor(this, 2)" data-tracage="">Réclamation</button>
         </div>
     </div>
 
@@ -99,7 +99,10 @@
                 <button id="explicationFacture" class="btn hidden facturation" onclick="changeColor(this, 3);" data-image-root="boutons/transmission_releves/logoedf" data-image-number="5">Explication de facture</button>
                 <button id="estimationRegul" class="btn hidden facturation" onclick="changeColor(this, 3);" data-image-root="boutons/transmission_releves/logoedf" data-image-number="5">Estimation de régularisation</button>
                 <button id="contestationFacture" class="btn hidden facturation" onclick="changeColor(this, 3);" data-image-root="boutons/transmission_releves/logoedf" data-image-number="5">Contestation de facture</button>
-                </div>
+                <button id="modifierRDV" class="btn hidden RDV" onclick="changeColor(this, 3);" data-image-root="boutons/transmission_releves/logoedf" data-image-number="5">Modifier un RDV</button>
+                <button id="reclamationRDV" class="btn hidden RDV" onclick="changeColor(this, 3);" data-image-root="boutons/transmission_releves/logoedf" data-image-number="5">Réclamation rdv</button>
+                <button id="modifierOffre" class="btn hidden changement-offre" onclick="changeColor(this, 3)" data-image-root="boutons/transmission_releves/logoedf" data-image-number="5">Changement d'offre</button>
+            </div>
             </div>
         </div>
     </div>
@@ -124,6 +127,39 @@
     <button class="next">❯</button>
 </div>
 
+<h2>Demandes techniques effectuées</h2>
+<div class="step" data-step="5">
+    <div class="btnGroup">
+        <label for="spid">
+            <input type="checkbox" id="spid" onclick="toggleReferenceField(this, 'spidReference')" />
+            SPID
+        </label>
+        <label for="enedis">
+            <input type="checkbox" id="enedis" onclick="toggleReferenceField(this, 'enedisReference')" />
+            ENEDIS
+        </label>
+        <label for="grdf">
+            <input type="checkbox" id="grdf" onclick="toggleReferenceField(this, 'grdfReference')" />
+            GRDF
+        </label>
+    </div>
+    
+    <!-- Champs de référence qui apparaîtront quand la case est cochée -->
+    <div id="spidReference" class="referenceField hidden">
+        <label for="spidNumber">Numéro de demande SPID:</label>
+        <input type="text" id="spidNumber" class="referenceInput" />
+    </div>
+    
+    <div id="enedisReference" class="referenceField hidden">
+        <label for="enedisNumber">Numéro de demande ENEDIS:</label>
+        <input type="text" id="enedisNumber" class="referenceInput" />
+    </div>
+    
+    <div id="grdfReference" class="referenceField hidden">
+        <label for="grdfNumber">Numéro de demande GRDF:</label>
+        <input type="text" id="grdfNumber" class="referenceInput" />
+    </div>
+</div>
 
     <h2>Placements</h2>
     <div class="step" data-step="4">

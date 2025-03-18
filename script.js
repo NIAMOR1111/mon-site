@@ -112,7 +112,7 @@ function toggleCross(element) {
     element.innerHTML = "✖"; // Affiche une croix
 }
 
-function tracage () {
+document.getElementById("validerTracage").addEventListener("click", function () {
     const tracageVisible = document.querySelectorAll('[data-tracage]:not(.hidden)');
     const tracageFinal = [];
 
@@ -130,10 +130,52 @@ function tracage () {
 
     const tracageBox = document.getElementById('tracageBox');
     tracageBox.classList.remove('hidden');
-}
+
+    let tracageDisplay = document.getElementById("tracageDisplay");
+    tracageDisplay.innerHTML = ""; // Réinitialiser le contenu du tracage à chaque appel
+
+    // Vérification des demandes techniques et ajout des informations de tracage
+    let tracageMessage = ""; // Variable pour accumuler les messages de tracage
+
+    // Vérification de la demande SPID
+    if (document.getElementById("spid").checked) {
+        const spidNumber = document.getElementById("spidNumber").value;
+        if (spidNumber) {
+            tracageMessage += `J'ai fait une demande SPID : ${spidNumber}<br>`;
+        } else {
+            tracageMessage += `La demande SPID a été cochée, mais aucun numéro n'a été saisi.<br>`;
+        }
+    }
+
+    // Vérification de la demande ENEDIS
+    if (document.getElementById("enedis").checked) {
+        const enedisNumber = document.getElementById("enedisNumber").value;
+        if (enedisNumber) {
+            tracageMessage += `J'ai fait une demande ENEDIS : ${enedisNumber}<br>`;
+        } else {
+            tracageMessage += `La demande ENEDIS a été cochée, mais aucun numéro n'a été saisi.<br>`;
+        }
+    }
+
+    // Vérification de la demande GRDF
+    if (document.getElementById("grdf").checked) {
+        const grdfNumber = document.getElementById("grdfNumber").value;
+        if (grdfNumber) {
+            tracageMessage += `J'ai fait une demande GRDF : ${grdfNumber}<br>`;
+        } else {
+            tracageMessage += `La demande GRDF a été cochée, mais aucun numéro n'a été saisi.<br>`;
+        }
+    }
+
+    // Si des messages de tracage ont été générés, les afficher dans tracageDisplay
+    if (tracageMessage) {
+        tracageDisplay.innerHTML = tracageMessage;
+        tracageDisplay.classList.remove("hidden"); // Afficher l'élément tracageDisplay
+    }
+})
 
 
-function rgpdTracage() {
+document.getElementById("validerTracage").addEventListener("click", function () {
     const confirmationLines = document.querySelectorAll('.confirmationLine:not(.hidden)');
     let uncheckedNames = [];
     
@@ -159,7 +201,7 @@ function rgpdTracage() {
     // Vous pouvez ensuite mettre ce message dans un élément HTML si besoin
     const tracageDisplay = document.getElementById('tracageDisplay');
     tracageDisplay.innerHTML = `Message: ${tracage}`; // Affichage dans le tracageDisplay
-}
+})
 
 document.querySelectorAll('.nextStep').forEach(button => {
     button.addEventListener('click', () => {
@@ -228,14 +270,6 @@ document.getElementById('backButton').addEventListener('click', () => {
     const hideDisplay = document.querySelector('#messageDisplay');
     hideDisplay.classList.add('hidden');
 });
-
-
-function transmissionReleves(button) {
-    const showOption = document.querySelectorAll('.transmissionReleves, #textBoxDisplay, #messageDisplay');
-    showOption.forEach(element => {
-        element.classList.remove('hidden');
-    });
-}
 
 document.addEventListener("DOMContentLoaded", function () {
     const gallerie = document.getElementById("gallerie");
@@ -344,12 +378,70 @@ document.querySelectorAll('.nextStep').forEach(button => {
             });
         });
 })
+const makeappear = document.getElementById('messageDisplay');
+makeappear.classList.remove('hidden');
+
 });
 
-document.querySelectorAll('.nextStep').forEach(button => {
-    button.addEventListener('click', () => {
+//copier le texte de traçage en un clic gauche
+// Fonction pour copier le texte de la zone tracageDisplay
+document.getElementById("tracageDisplay").addEventListener("click", function() {
+    // Crée un élément temporaire de type texte
+    const range = document.createRange();
+    range.selectNodeContents(this);
+    
+    // Sélectionne le texte de la zone
+    const selection = window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
+    
+    // Tente de copier le texte dans le presse-papiers
+    try {
+        document.execCommand('copy');
+        alert("Le texte a été copié !");
+    } catch (err) {
+        console.error("Erreur lors de la copie : ", err);
+    }
+    
+    // Désélectionne le texte après la copie
+    selection.removeAllRanges();
+});
 
-        const makeappear = document.getElementById('messageDisplay');
-        makeappear.classList.remove('hidden');
-    })
+document.getElementById('backButton').addEventListener('click', ()=> {
+    const hideTracage = document.querySelector('#tracageBox');
+    hideTracage.classList.add('hidden');
 })
+
+const buttons = document.querySelectorAll('.typeTracage');
+
+buttons.forEach(button => {
+    button.addEventListener('click', function() {
+        // Récupérer la date et l'heure actuelles  
+        const now = new Date();
+        const dateString = now.toLocaleString();
+
+        // Mettre à jour le data-tracage  
+        if (this.textContent.trim() === 'Demande') {
+            this.setAttribute('data-tracage', `Le client a formulé une demande le ${dateString}`);
+        } else if (this.textContent.trim() === 'Réclamation') {
+            this.setAttribute('data-tracage', `Le client a formulé une réclamation le ${dateString}`);
+        }
+
+        // Annuler le data-tracage de l'autre bouton  
+        buttons.forEach(btn => {
+            if (btn !== this) {
+                btn.setAttribute('data-tracage', '');
+            }
+        });
+    });
+});
+
+// Fonction pour afficher/masquer le champ de référence
+function toggleReferenceField(checkbox, referenceId) {
+    const referenceField = document.getElementById(referenceId);
+    if (checkbox.checked) {
+        referenceField.classList.remove('hidden');
+    } else {
+        referenceField.classList.add('hidden');
+    }
+}

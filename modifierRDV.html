@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modification de Rendez-vous</title>
+    <style>
+        #formContainer {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .column {
+            width: 45%;
+        }
+        .inputContainer {
+            margin: 15px 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        .hidden {
+            display: none;
+        }
+        .alert {
+            color: red;
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            border: 1px solid red;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #ffe6e6;
+            text-align: center;
+        }
+        .button {
+            background-color: #007BFF;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        .entry {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+            align-items: center;
+        }
+        /* Nouvelle classe pour aligner la date et l'heure sur la même ligne */
+        .dateTimeWrapper {
+            display: flex;
+            gap: 10px; /* Espacement entre la date et l'heure */
+            align-items: center;
+        }
+        input[type="date"] {
+            width: 100%; /* La date prend toute la largeur */
+            padding: 8px;
+        }
+        input[type="number"] {
+            width: 70px; /* Petite largeur pour l'heure */
+            padding: 8px;
+        }
+        select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <br>
+    <div class="alert">Vérifier que les demandes soient bien annulées chez les distributeurs</div>
+    <div id="formContainer">
+        <!-- Colonne de gauche -->
+        <div class="column">
+            <h3>Modifier un rendez-vous</h3>
+            <div class="inputContainer">
+                <label>Énergie :</label>
+                <label><input type="radio" name="energie" value="Gaz"> Gaz</label>
+                <label><input type="radio" name="energie" value="Électricité"> Électricité</label>
+            </div>
+            <div class="inputContainer">
+                <label>Action :</label>
+                <label><input type="radio" name="action" value="Annulation"> Annulation</label>
+                <label><input type="radio" name="action" value="Modification"> Modification</label>
+            </div>
+            <div id="modificationDetails" class="hidden">
+                <div class="inputContainer">
+                    <label>Date et créneau initial :</label>
+                    <div class="dateTimeWrapper">
+                        <input type="date" id="initialDate">
+                        <select id="initialTimeStart">
+                            <option value="">Sélectionner une heure</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="inputContainer">
+                    <label>Nouvelle date et créneau :</label>
+                    <div class="dateTimeWrapper">
+                        <input type="date" id="newDate">
+                        <select id="newTimeStart">
+                            <option value="">Sélectionner une heure</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div id="annulationDetails" class="hidden">
+                <label>Date du rendez-vous :</label>
+                <input type="date" id="cancelDate">
+            </div>
+            <div class="inputContainer">
+                <label>Motif :</label>
+                <select id="motif">
+                    <option value="MES">MES</option>
+                    <option value="Résiliation">Résiliation</option>
+                    <option value="Demande d'enquête">Demande d'enquête</option>
+                    <option value="Autre">Autre</option>
+                </select>
+                <input type="text" id="otherMotif" class="hidden" placeholder="Précisez le motif">
+            </div>
+            <button class="button" id="addRdvBtn">Ajouter</button>
+        </div>
+
+        <!-- Colonne de droite -->
+        <div class="column">
+            <h3>Rendez-vous en attente :</h3>
+            <div id="rdvList"></div>
+        </div>
+    </div>
+
+    <script>
+        // Fonction pour générer dynamiquement les options pour les heures (0-23)
+        function generateHourOptions(selectElement) {
+            for (let i = 0; i < 24; i++) {
+                let hour = i < 10 ? '0' + i : i;  // Formatage pour ajouter un zéro devant les heures inférieures à 10
+                let option = document.createElement("option");
+                option.value = hour;
+                option.textContent = hour + ":00";
+                selectElement.appendChild(option);
+            }
+        }
+
+        // Génération dynamique des options d'heures pour les créneaux
+        generateHourOptions(document.getElementById("initialTimeStart"));
+        generateHourOptions(document.getElementById("newTimeStart"));
+
+        document.querySelectorAll("input[name='action']").forEach(radio => {
+            radio.addEventListener("change", function() {
+                document.getElementById("modificationDetails").classList.toggle("hidden", this.value !== "Modification");
+                document.getElementById("annulationDetails").classList.toggle("hidden", this.value !== "Annulation");
+            });
+        });
+
+        document.getElementById("motif").addEventListener("change", function() {
+            document.getElementById("otherMotif").classList.toggle("hidden", this.value !== "Autre");
+        });
+
+        document.getElementById("addRdvBtn").addEventListener("click", function () {
+            const energie = document.querySelector("input[name='energie']:checked");
+            const action = document.querySelector("input[name='action']:checked");
+            const motif = document.getElementById("motif").value === "Autre" ? document.getElementById("otherMotif").value : document.getElementById("motif").value;
+            
+            if (!energie || !action || !motif) {
+                alert("Veuillez remplir tous les champs.");
+                return;
+            }
+            
+            let tracageText = "";
+            let energieText = energie.value === "Gaz" ? "de Gaz" : "d'Électricité"; // Modifié pour changer dynamiquement selon l'énergie sélectionnée
+            if (action.value === "Annulation") {
+                const cancelDate = document.getElementById("cancelDate").value;
+                tracageText = `J'ai annulé le RDV (${motif}) ${energieText} prévu au ${cancelDate}.`;
+            } else {
+                const initialDate = document.getElementById("initialDate").value;
+                const newDate = document.getElementById("newDate").value;
+                const newTimeStart = document.getElementById("newTimeStart").value;
+                tracageText = `J'ai modifié le RDV (${motif}) ${energieText} du ${initialDate} au ${newDate} à ${newTimeStart} heures.`;
+            }
+
+            // Ajouter dans la liste à droite
+            const rdvList = document.getElementById("rdvList");
+            const entry = document.createElement("div");
+            entry.classList.add("entry");
+            entry.innerHTML = `<span>${tracageText}</span> <button onclick="this.parentElement.remove()">Supprimer</button>`;
+            rdvList.appendChild(entry);
+        });
+
+        document.getElementById("validerTracage").addEventListener("click", function () {
+            const rdvList = document.getElementById("rdvList");
+            const tracageDisplay = document.getElementById("tracageDisplay");
+            tracageDisplay.innerHTML = ""; // Effacer les tracages précédents
+            tracageDisplay.classList.remove('hidden');
+
+            const entries = rdvList.querySelectorAll(".entry");
+            entries.forEach(entry => {
+                tracageDisplay.innerHTML += `<p>${entry.querySelector("span").textContent}</p>`;
+            });
+        });
+    </script>
+</body>
+</html>

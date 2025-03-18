@@ -1,52 +1,75 @@
-<input type="radio" id="factureNonRecue" name="motif" value="factureNonRecue">
-<label for="factureNonRecue">Facture non reçue</label>
-<br>
-<input type="radio" id="factureNonEditee" name="motif" value="factureNonEditee">
-<label for="factureNonEditee">Problème d'édition de facture</label>
-<br>
-<input type="radio" id="factureMultiple" name="motif" value="factureMultiple">
-<label for="factureMultiple">Facture multiple</label>
-<br><br>
-<div id="champDate">
-<label for="dateFacture">Date d'édition de la facture :</label>
-<input type="date" id="dateFacture" name="dateFacture" value="today">
-</div>
-
-<script>
-    // Obtenir la date d'aujourd'hui
-    const today = new Date();
-    const isoDate = today.toISOString().split('T')[0];
-    document.getElementById('dateFacture').value = isoDate;
-
-    // Gestion des phrases associées
-    const phrases = {
-        factureNonRecue: "Le client n'a pas reçu la facture du ",
-        factureMultiple: "Le client indique avoir reçu plusieurs fois la facture du ",
-        factureNonEditee: "Le client n'a toujours pas eu de facture éditée à la date du ",
-    };
-
-    const radios = document.querySelectorAll('input[name="motif"]');
-    const dateInput = document.getElementById('dateFacture');
-    const traceContainer = document.getElementById("tracageDisplay");
-
-    // Bouton de validation
-    const validerButton = document.getElementById("validerTracage");
-
-    validerButton.addEventListener("click", function () {
-        const selectedMotif = document.querySelector('input[name="motif"]:checked');
-        const selectedDate = dateInput.value;
-
-        if (selectedMotif && selectedDate) {
-            // Construire la phrase de traçage
-            const tracage = phrases[selectedMotif.value] + selectedDate + ".";
-
-            // Ajouter le tracage dans le conteneur
-            const paragraph = document.createElement("p");
-            paragraph.textContent = tracage;
-            traceContainer.appendChild(paragraph);
-        } else {
-            // Si aucun motif ou date n'est sélectionné
-            alert("Veuillez sélectionner un motif et une date.");
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tracage Facturation</title>
+    <style>
+    
+        .inputGroup {
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
         }
-    });
-</script>
+        .inputGroup label {
+            margin-left: 10px;
+        }
+    
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h3>Suivi de Facturation</h3>
+        <div class="inputGroup">
+            <input type="radio" id="factureNonRecue" name="factureStatus" value="factureNonRecue">
+            <label for="factureNonRecue">Facture non reçue</label>
+        </div>
+        <div class="inputGroup">
+            <input type="radio" id="factureMultiple" name="factureStatus" value="factureMultiple">
+            <label for="factureMultiple">Facture multiple</label>
+        </div>
+        <div class="inputGroup">
+            <input type="radio" id="factureNonEditee" name="factureStatus" value="factureNonEditee">
+            <label for="factureNonEditee">Facture non éditée</label>
+        </div>
+        <div class="inputGroup">
+            <label for="datePicker">Sélectionnez la date :</label>
+            <input type="date" id="datePicker">
+        </div>
+    </div>
+
+    <script>
+        function formatDateInFrench(isoDate) {
+            if (!isoDate) return "Date non spécifiée";
+            const options = { year: "numeric", month: "long", day: "numeric" };
+            const date = new Date(isoDate);
+            if (isNaN(date)) return "Format de date invalide";
+            return date.toLocaleDateString("fr-FR", options);
+        }
+
+        document.getElementById("validerTracage").addEventListener("click", function () {
+            const date = document.getElementById("datePicker").value.trim();
+            if (!date) {
+                alert("Veuillez sélectionner une date.");
+                return;
+            }
+            const formattedDate = formatDateInFrench(date);
+            let selectedMessage = "";
+
+            if (document.getElementById("factureNonRecue").checked) {
+                selectedMessage = `Le client n'a pas reçu la facture du ${formattedDate}.`;
+            } else if (document.getElementById("factureMultiple").checked) {
+                selectedMessage = `Le client indique avoir reçu plusieurs fois la facture du ${formattedDate}.`;
+            } else if (document.getElementById("factureNonEditee").checked) {
+                selectedMessage = `Le client n'a toujours pas eu de facture éditée à la date du ${formattedDate}.`;
+            } else {
+                alert("Veuillez sélectionner un type de problème de facturation.");
+                return;
+            }
+
+            document.getElementById("tracageDisplay").textContent = selectedMessage;
+            document.getElementById("tracageDisplay").classList.remove("hidden");
+        });
+    </script>
+</body>
+</html>

@@ -282,3 +282,16 @@ body{
 .next {
     right: 20px;
 }
+
+.referenceField {
+    margin-top: 10px;
+    margin-bottom: 15px;
+    text-align: center;  /* Centrer le contenu de la référence */
+}
+
+.referenceInput {
+    width: 200px;
+    padding: 5px;
+    margin-left: 10px;
+    text-align: center;  /* Centrer le texte à l'intérieur du champ */
+}
