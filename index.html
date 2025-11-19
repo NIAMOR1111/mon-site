@@ -1,187 +1,98 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8" />
-    <title>Tracage</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Outil de Traçage EDF</title>
     <link rel="stylesheet" href="style.css">
+    <style id="dynamic-module-style"></style>
 </head>
 <body>
-    <h1>Traçage d'appel</h1>
-    <div class="step" data-step="1">
-        <h2>RGPD : Authentification serveur :</h2>
-        <div class="btnGroup">
-            <button class="btn" onclick="changeColor(this, 1);showText(1, 'text1'); unselect()">Téléphone</button>
-            <button class="btn" onclick="changeColor(this, 1);showText(1, 'text2'); unselect()">BP</button>
-            <button class="btn" onclick="changeColor(this, 1);showText(1, 'text3'); unselect()">Aucune</button>
+
+    <div class="container">
+        <h1>1. Identification RGPD</h1>
+        
+        <div class="button-group">
+            <button type="button" class="id-button" data-target="verif-telephone" data-short-mode="téléphone">Identifié par Téléphone</button>
+            <button type="button" class="id-button" data-target="verif-bp" data-short-mode="numéro de client">Identifié par N° Client</button>
+            <button type="button" class="id-button" data-target="verif-none" data-short-mode="non identifié">Aucune identification</button>
         </div>
-        <div id="text1" class="text hidden">
-            <span class="underline">Authentification par numéro de téléphone. Merci de confirmer :</span>
-            <div class="confirmationLine" data-tracage="">
-        Le nom et prénom <div class="checkbox" data-name='Nom et prénom' onclick="toggleCheck(this)" ondblclick="toggleCross(this)"></div>
+        
+        <div class="verification-area">
+            <div id="verif-telephone" class="verif-block hidden">
+                <div class="verif-item"><span class="verif-box" data-status="none"></span><label>Confirmation Nom et Prénom</label></div>
             </div>
-        </div>
-        <div id="text2" class="text hidden">
-            <span class="underline">Authentification par numéro de client. Merci de confirmer :</span>
-            <div class="confirmationLine">
-            Le nom et prénom <div class="checkbox" data-name='Nom et prénom' onclick="toggleCheck(this)" ondblclick="toggleCross(this)"></div>
+            <div id="verif-bp" class="verif-block hidden">
+                <div class="verif-item"><span class="verif-box" data-status="none"></span><label>Nom et Prénom</label></div>
+                <div class="verif-item"><span class="verif-box" data-status="none"></span><label>Numéro de téléphone</label></div>
             </div>
-            <div class="confirmationLine">
-            Le numéro de téléphone <div class="checkbox" data-name='Numéro de téléphone' onclick="toggleCheck(this)" ondblclick="toggleCross(this)"></div>
+            <div id="verif-none" class="verif-block hidden">
+                <div class="verif-item"><span class="verif-box" data-status="none"></span><label>N° Client (PDL/PCE)</label></div>
+                <div class="verif-item"><span class="verif-box" data-status="none"></span><label>Nom Prénom</label></div>
+                <div class="verif-item"><span class="verif-box" data-status="none"></span><label>Adresse postale</label></div>
+                <div class="verif-item"><span class="verif-box" data-status="none"></span><label>Numéro de téléphone</label></div>
+                <div class="verif-item"><span class="verif-box" data-status="none"></span><label>Adresse mail</label></div>
             </div>
-        </div>
-        <div id="text3" class="text hidden">
-            <span class="underline">Aucune authentification. Merci de confirmer :</span>
-            <div class="confirmationLine">
-            Le numéro de client <div class="checkbox" data-name='Numéro de client' onclick="toggleCheck(this)" ondblclick="toggleCross(this)"></div>
-            </div>
-            <div class="confirmationLine">
-            Le nom et prénom <div class="checkbox" data-name='Nom et prénom' onclick="toggleCheck(this)" ondblclick="toggleCross(this)"></div>
-            </div>
-            <div class="confirmationLine">
-            L'adresse <div class="checkbox" data-name='Adresse' onclick="toggleCheck(this)" ondblclick="toggleCross(this)"></div>
-            </div>
-            <div class="confirmationLine">
-            Le numéro de téléphone <div class="checkbox" data-name='Numéro de téléphone' onclick="toggleCheck(this)" ondblclick="toggleCross(this)"></div>
-            </div>
-            <div class="confirmationLine">
-            L'adresse mail <div class="checkbox" data-name='Adresse mail' onclick="toggleCheck(this)" ondblclick="toggleCross(this)"></div>
-             </div>
         </div>
 
-    </div>
-    <div class="step" data-step="2">
-        <h2>Motif d'appel :</h2>
-        <div class="btnGroup">
-            <button class="btn typeTracage" onclick="changeColor(this, 2)" data-tracage="">Demande</button>
-            <button class="btn typeTracage" onclick="changeColor(this, 2)" data-tracage="">Réclamation</button>
-        </div>
-    </div>
-
-    <div class="step" data-step="3">
-        <div class="btnGroup">
-            <button class="btn main" onclick="changeColor(this, 3); showButtons(this);" data-group="gestion-contrat">Gestion du contrat</button>
-            <button class="btn hidden gestion-contrat" onclick="changeColor(this, 3); showButtons(this);" data-group="souscription">Souscription</button>
-            <button class="btn hidden gestion-contrat" onclick="changeColor(this, 3); showButtons(this);" data-group="changement-offre">Changement d'offre</button>
-            <button class="btn hidden gestion-contrat" onclick="changeColor(this, 3); showButtons(this);" data-group="changement-tarifaire">Changement d'option tarifaire</button>
-            <button class="btn hidden gestion-contrat" onclick="changeColor(this, 3); showButtons(this);" data-group="facturation">Facturation</button>
-            <button class="btn hidden gestion-contrat" onclick="changeColor(this, 3); showButtons(this);" data-group="branchement-provisoire">Branchement provisoire</button>
-            <button class="btn hidden gestion-contrat" onclick="changeColor(this, 3); showButtons(this);" data-group="resiliation">Résiliation</button>
-            <button class="btn hidden gestion-contrat" onclick="changeColor(this, 3); showButtons(this);" data-group="inversion-pdl">Inversion de PDL/PCE</button>
-            <button class="btn main" onclick="changeColor(this, 3); showButtons(this);" data-group="demande-distributeur">Demande au distributeur</button>
-            <button class="btn hidden demande-distributeur" onclick="changeColor(this, 3); showButtons(this);" data-group="RDV">RDV</button>
-            <button class="btn hidden demande-distributeur" onclick="changeColor(this, 3); showButtons(this);" data-group="panne">Panne de courant</button>
-            <button class="btn hidden demande-distributeur" onclick="changeColor(this, 3); showButtons(this);" data-group="probleme-materiel">Problème de matériel</button>
-            <button class="btn hidden demande-distributeur" onclick="changeColor(this, 3); showButtons(this);" data-group="intervention">Demande d'intervention</button>
-            <button class="btn hidden demande-distributeur" onclick="changeColor(this, 3); showButtons(this);" data-group="compteur-communiquant">Pose de compteur communiquant</button>
-            <button class="btn hidden demande-distributeur" onclick="changeColor(this, 3); showButtons(this);" data-group="releves">Transmission de relevés</button>
-            <button class="btn hidden duplicata" onclick="changeColor(this, 3); showButtons(this);" data-group="attestation">Demande d'attestation</button>
-            <button class="btn hidden duplicata" onclick="changeColor(this, 3); showButtons(this);" data-group="besoin-duplicata">Besoin de duplicata</button>
-            <button class="btn hidden explication" onclick="changeColor(this, 3); showButtons(this);" data-group="modification-echeancier">Modification d'échéancier</button>
-            <button class="btn hidden explication" onclick="changeColor(this, 3); showButtons(this);" data-group="incomprehension-facture">Incompréhension de facture</button>
-            <button class="btn hidden explication" onclick="changeColor(this, 3); showButtons(this);" data-group="explication-detaillee">Explication détaillée</button>
-            <button class="btn hidden mode" onclick="changeColor(this, 3); showButtons(this);" data-group="souscrire-mens">Souscrire à la mensualisation</button>
-            <button class="btn hidden mode" onclick="changeColor(this, 3); showButtons(this);" data-group="arret-mens">Arrêter la mensualisation</button>
-            <button class="btn hidden mode" onclick="changeColor(this, 3); showButtons(this);" data-group="facture-mensuelle">Passer en facture mensuelle</button>
-            <button class="btn hidden mode" onclick="changeColor(this, 3); showButtons(this);" data-group="modification-impossible">Modification impossible</button>
-            <button class="btn hidden duplicata" onclick="changeColor(this, 3); showButtons(this);" data-group="besoin-duplicata">Besoin de duplicata</button>
-            <button class="btn hidden duplicata" onclick="changeColor(this, 3); showButtons(this);" data-group="besoin-duplicata">Besoin de duplicata</button>
-            <button class="btn hidden duplicata" onclick="changeColor(this, 3); showButtons(this);" data-group="besoin-duplicata">Besoin de duplicata</button>
-            <button class="btn hidden duplicata" onclick="changeColor(this, 3); showButtons(this);" data-group="besoin-duplicata">Besoin de duplicata</button>
-            <button class="btn hidden releves" onclick="changeColor(this, 3); showButtons(this);" data-group="besoin-duplicata">Besoin de duplicata</button>
-            <div class="nextStep">
-                <div class="btnGroup">
-                <button id="resilElec" class="btn hidden resiliation" onclick="changeColor(this, 3);" data-image-root="boutons/transmission_releves/logoedf" data-image-number="5">Electricité</button>
-                <button id="resilGaz" class="btn hidden resiliation" onclick="changeColor(this, 3);" data-image-root= "logoedf" data-image-count="5">Gaz</button>
-                <button id="resilGazElec" class="btn hidden resiliation" onclick="changeColor(this, 3);" data-image-root= "logoedf" data-image-count="5">Electricité et gaz</button>    
-                <button id="relevesButton" class="btn hidden releves" onclick="changeColor(this, 3);" data-image-root="boutons/transmission_releves/logoedf" data-image-number="5">Transmission de relevé</button>
-                <button id="envoiDuplicata" class="btn hidden facturation" onclick="changeColor(this, 3);" data-image-root="boutons/transmission_releves/logoedf" data-image-number="5">Duplicata</button>
-                <button id="pbEditionFacture" class="btn hidden facturation" onclick="changeColor(this, 3);" data-image-root="boutons/transmission_releves/logoedf" data-image-number="5">Facture non reçu, multiple</button>
-                <button id="explicationFacture" class="btn hidden facturation" onclick="changeColor(this, 3);" data-image-root="boutons/transmission_releves/logoedf" data-image-number="5">Explication de facture</button>
-                <button id="estimationRegul" class="btn hidden facturation" onclick="changeColor(this, 3);" data-image-root="boutons/transmission_releves/logoedf" data-image-number="5">Estimation de régularisation</button>
-                <button id="contestationFacture" class="btn hidden facturation" onclick="changeColor(this, 3);" data-image-root="boutons/transmission_releves/logoedf" data-image-number="5">Contestation de facture</button>
-                <button id="modifierRDV" class="btn hidden RDV" onclick="changeColor(this, 3);" data-image-root="boutons/transmission_releves/logoedf" data-image-number="5">Modifier un RDV</button>
-                <button id="reclamationRDV" class="btn hidden RDV" onclick="changeColor(this, 3);" data-image-root="boutons/transmission_releves/logoedf" data-image-number="5">Réclamation rdv</button>
-                <button id="modifierOffre" class="btn hidden changement-offre" onclick="changeColor(this, 3)" data-image-root="boutons/transmission_releves/logoedf" data-image-number="5">Changement d'offre</button>
-            </div>
+        <hr id="section-separator" class="hidden"> 
+        
+        <div id="motif-appel-section" class="hidden">
+            <h2>2. Motif de l'appel</h2>
+            <div class="motif-group">
+                <button type="button" class="motif-button" data-motif="demande">Demande</button>
+                <button type="button" class="motif-button" data-motif="reclamation">Réclamation</button>
             </div>
         </div>
-    </div>
-    <button class="btn" id="backButton" onclick="goBackToGroup()">Retour au menu</button>
-
-    </div>
-
-<div class="hidden" id="messageDisplay">
-    <div id='aideTracage'></div> 
-    <br>
-    <div id="gallerie">
-        <!-- Les miniatures seront générées dynamiquement ici -->
-    </div>
-    <div id="conteneur"></div>
-</div>
-
-  <!-- Modal -->
-  <div id="imageModal" class="modal">
-    <span class="close">&times;</span>
-    <button class="prev">❮</button>
-    <img class="modal-content" id="modalImage" alt="Image">
-    <button class="next">❯</button>
-</div>
-
-<h2>Demandes techniques effectuées</h2>
-<div class="step" data-step="5">
-    <div class="btnGroup">
-        <label for="spid">
-            <input type="checkbox" id="spid" onclick="toggleReferenceField(this, 'spidReference')" />
-            SPID
-        </label>
-        <label for="enedis">
-            <input type="checkbox" id="enedis" onclick="toggleReferenceField(this, 'enedisReference')" />
-            ENEDIS
-        </label>
-        <label for="grdf">
-            <input type="checkbox" id="grdf" onclick="toggleReferenceField(this, 'grdfReference')" />
-            GRDF
-        </label>
-    </div>
-    
-    <!-- Champs de référence qui apparaîtront quand la case est cochée -->
-    <div id="spidReference" class="referenceField hidden">
-        <label for="spidNumber">Numéro de demande SPID:</label>
-        <input type="text" id="spidNumber" class="referenceInput" />
-    </div>
-    
-    <div id="enedisReference" class="referenceField hidden">
-        <label for="enedisNumber">Numéro de demande ENEDIS:</label>
-        <input type="text" id="enedisNumber" class="referenceInput" />
-    </div>
-    
-    <div id="grdfReference" class="referenceField hidden">
-        <label for="grdfNumber">Numéro de demande GRDF:</label>
-        <input type="text" id="grdfNumber" class="referenceInput" />
-    </div>
-</div>
-
-    <h2>Placements</h2>
-    <div class="step" data-step="4">
-        <div class="btnGroup">
-            <button class="btn4 hidden" onclick="placements()" data-tracage="Le client a souscrit à la mensualisation">Mens</button>
-            <button class="btn4 hidden" onclick="placements()" data-tracage="Le client a souscrit à la facture électronique">FE</button>
-            <button class="btn4 hidden" onclick="placements()" data-tracage="Le client a souscrit à l'assistance dépannage">AD</button>
-            <button class="btn4 hidden" onclick="placements()" data-tracage="Le client a souscrit à l'assurénergie +">A+</button>
-            <button class="btn4 hidden" onclick="placements()" data-tracage="Le client a demandé à être mis en relation avec un conseiller Homiris">EPS</button>
-            <button class="btn4 hidden" onclick="placements()" data-tracage="Le client a demandé à être recontacté par IZI by EDF">IZI/EDF</button>
-            <button class="btn4 hidden" onclick="placements()" data-tracage="Le client a demandé à être recontacté par IZI confort">IZI/confort</button>
+        
+        <hr id="section-separator-2" class="hidden"> 
+        
+        <div id="arborescence-section" class="hidden">
+            <h2>3. Arborescence et Action</h2>
+            <div id="categories-container" class="button-group">
+                <button type="button" class="category-button" data-category="puissance">Puissance</button>
+                <button type="button" class="category-button" data-category="facturation">Facturation</button>
+                <button type="button" class="category-button" data-category="contrat">Contrat</button>
+                <button type="button" class="category-button" data-category="intervention">Intervention</button>
+            </div>
+            <div id="subcategories-container" class="button-group hidden"></div>
+            <div id="action-area" class="action-block hidden"></div>
         </div>
 
-
-        <!-- Bloc pour le traçage final -->
-        <button class="text" id="validerTracage" onclick="rgpdTracage (); tracage()">Générer traçage</button>
-        <div id="tracageBox" class="hidden">
-            <p id="tracageDisplay" class="hidden"></p>
-            <p id="placementsDisplay" class="hidden"></p>
+        <div id="suivi-demande-section" class="hidden">
+            <h2>4. Suivi de la demande</h2>
+            <div class="suivi-container">
+                <div class="suivi-row"><div class="suivi-header"><input type="checkbox" id="check-sge" data-target="content-sge"><label for="check-sge">N° SGE</label></div><div id="content-sge" class="suivi-content hidden"><input type="text" placeholder="Numéro SGE"></div></div>
+                <div class="suivi-row"><div class="suivi-header"><input type="checkbox" id="check-portail" data-target="content-portail"><label for="check-portail">N° Portail</label></div><div id="content-portail" class="suivi-content hidden"><input type="text" placeholder="Numéro Portail"></div></div>
+                <div class="suivi-row"><div class="suivi-header"><input type="checkbox" id="check-spidmi" data-target="content-spidmi"><label for="check-spidmi">N° SPIDMI</label></div><div id="content-spidmi" class="suivi-content hidden"><input type="text" placeholder="Numéro SPIDMI"></div></div>
+                <div class="suivi-row"><div class="suivi-header"><input type="checkbox" id="check-otd" data-target="content-otd"><label for="check-otd">OTD</label></div><div id="content-otd" class="suivi-content hidden"><label class="sub-label">Superviseur:</label><input type="text" id="otd-superviseur"><label class="sub-label">Détails:</label><textarea id="otd-details"></textarea><label class="sub-label">Recontact:</label><input type="text" id="otd-date" readonly></div></div>
+            </div>
         </div>
+
+        <div id="bilan-appel-section" class="hidden">
+            <h2>5. Bilan</h2>
+            <p class="instruction-text">Clic Gauche: Souscrit | Double Clic: Refusé | Clic Droit: Proposé</p>
+            <div class="bilan-grid">
+                <div class="bilan-item"><span class="bilan-box" data-status="none" data-type="sub" data-label="Mensualisation"></span><label>Mens</label></div>
+                <div class="bilan-item"><span class="bilan-box" data-status="none" data-type="sub" data-label="Facture Elec"></span><label>FE</label></div>
+                <div class="bilan-item"><span class="bilan-box" data-status="none" data-type="sub" data-label="Assistance Dep"></span><label>AD</label></div>
+                <div class="bilan-item"><span class="bilan-box" data-status="none" data-type="sub" data-label="Assurénergie+"></span><label>A+</label></div>
+                <div class="bilan-item"><span class="bilan-box" data-status="none" data-type="sub" data-label="VARC AD"></span><label>VARC AD</label></div>
+                <div class="bilan-item"><span class="bilan-box" data-status="none" data-type="sub" data-label="VARC A+"></span><label>VARC A+</label></div>
+                <div class="bilan-item"><span class="bilan-box" data-status="none" data-type="sub" data-label="IZI Confort"></span><label>IZI Confort</label></div>
+                <div class="bilan-item"><span class="bilan-box" data-status="none" data-type="rel" data-label="IZI by EDF"></span><label>IZI by EDF</label></div>
+                <div class="bilan-item"><span class="bilan-box" data-status="none" data-type="rel" data-label="Homiris"></span><label>Homiris</label></div>
+            </div>
+        </div>
+
+        <button type="button" id="generate-button">Générer le traçage</button>
+
+        <div id="trace-output-container" class="hidden">
+            <label for="trace-output">Traçage généré :</label>
+            <textarea id="trace-output" readonly></textarea>
+        </div>
+
     </div>
-    
     <script src="script.js"></script>
 </body>
 </html>

@@ -1,447 +1,335 @@
-//changer la couleur des boutons principaux
-function changeColor(element, etapeId){
+document.addEventListener("DOMContentLoaded", function() {
     
-    //vérifier si un bouton est déjà cliqué dans cette étape
-    if (lastClick[etapeId]){
-        //retire la classe orange du dernier bouton cliqué
-        lastClick[etapeId].classList.remove("orange");
+    // --- 1. SÉLECTEURS GLOBAUX ---
+    const buttons = document.querySelectorAll('.id-button');
+    const motifButtons = document.querySelectorAll('.motif-button');
+    
+    // Sections HTML
+    const verifBlocks = document.querySelectorAll('.verif-block');
+    const motifSection = document.getElementById('motif-appel-section');
+    const separators = document.querySelectorAll('hr');
+    const arborescenceSection = document.getElementById('arborescence-section');
+    const categoriesContainer = document.getElementById('categories-container');
+    const subcategoriesContainer = document.getElementById('subcategories-container');
+    const actionArea = document.getElementById('action-area');
+    const suiviDemandeSection = document.getElementById('suivi-demande-section');
+    const bilanAppelSection = document.getElementById('bilan-appel-section');
+    
+    // Style dynamique
+    const dynamicStyle = document.getElementById('dynamic-module-style');
 
+    // Outputs
+    const generateButton = document.getElementById('generate-button');
+    const outputContainer = document.getElementById('trace-output-container');
+    const outputTextarea = document.getElementById('trace-output');
+    
+    // --- 2. VARIABLES GLOBALES ---
+    window.traceAction = ""; 
+    let selectedMotif = null;
+    let currentModuleCleanup = null; // Pour nettoyer le script du module précédent
+
+    // --- 3. DONNÉES ARBORESCENCE ---
+    const arborescence = {
+        puissance: { 
+            label: "Puissance", 
+            sub: { 
+                changement_puissance: { label: "Changement de puissance", file: "aide_changement_puissance.html" }, 
+                info_puissance: { label: "Information sur la puissance", file: "aide_info_puissance.html" } 
+            } 
+        },
+        facturation: { 
+            label: "Facturation", 
+            sub: { 
+                paiement: { label: "Paiement et échéancier", file: "aide_paiement.html" }, 
+                contestation: { label: "Contestation et Remboursement", file: "aide_contestation.html" } 
+            } 
+        },
+        contrat: { 
+            label: "Contrat", 
+            sub: { 
+                souscription_resiliation: { label: "Souscription / Résiliation", file: "aide_contrat.html" }, 
+                modification_offre: { label: "Modification d'offre", file: "aide_modification_offre.html" } 
+            } 
+        },
+        intervention: { 
+            label: "Intervention", 
+            sub: { 
+                releve: { label: "Relève et Compteur", file: "aide_releve.html" }, 
+                depannage: { label: "Dépannage / Urgence", file: "aide_depannage.html" } 
+            } 
+        }
+    };
+
+    // --- 4. FONCTION DE CHARGEMENT MODULAIRE (Cœur du système) ---
+    async function loadExternalModule(filename) {
+        // A. Nettoyage
+        if (currentModuleCleanup) {
+            currentModuleCleanup(); // Appel de la fonction de nettoyage du module précédent
+            currentModuleCleanup = null;
+        }
+        dynamicStyle.innerHTML = ""; // Supprimer le CSS précédent
+        actionArea.innerHTML = '<p style="color:#666;">Chargement du module...</p>';
+        actionArea.classList.remove('hidden');
+        window.traceAction = ""; 
+
+        try {
+            const response = await fetch(filename);
+            if (!response.ok) throw new Error("Fichier introuvable");
+            
+            const htmlContent = await response.text();
+            
+            // B. Parsing
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(htmlContent, 'text/html');
+
+            // C. Injection CSS
+            const styles = doc.querySelectorAll('style');
+            styles.forEach(style => dynamicStyle.innerHTML += style.innerHTML);
+
+            // D. Injection HTML (Wrapper)
+            const wrapper = doc.querySelector('.module-wrapper') || doc.body;
+            // On retire les scripts du HTML parsé pour les exécuter manuellement après
+            wrapper.querySelectorAll('script').forEach(s => s.remove());
+            wrapper.querySelectorAll('style').forEach(s => s.remove());
+            
+            actionArea.innerHTML = wrapper.innerHTML;
+
+            // E. Exécution JS
+            const scripts = doc.querySelectorAll('script');
+            scripts.forEach(script => {
+                const newScript = document.createElement("script");
+                newScript.textContent = script.textContent;
+                document.body.appendChild(newScript); // Exécute le script
+                document.body.removeChild(newScript); // Nettoie la balise
+            });
+
+        } catch (error) {
+            actionArea.innerHTML = `
+                <h3>${filename}</h3>
+                <p>Simulation : Le fichier n'existe pas sur le serveur.</p>
+            `;
+            window.traceAction = `Le client a abordé le sujet : ${filename.replace('.html', '')}`;
+        }
     }
 
-    //ajoute ou retire la classe orange
-    element.classList.toggle("orange")
+    // --- 5. LOGIQUE ÉVÉNEMENTIELLE (Boutons et Interactions) ---
 
-    //stocke le bouton cliqué comme dernier bouton cliqué pour cette étape
-    lastClick[etapeId]=element.classList.contains("orange")?element:null;
-}
-
-//variable pour stocker le dernier bouton cliqué par étape
-const lastClick={
-    "1":null, //étape 1
-    "2":null, //étape 2
-    "3":null //étape 3
-};
-
-function showText (stepId, textId){
-    //sélectionner l'étape correspondante
-    const step = document.querySelector(`.step[data-step="${stepId}"]`);
-
-    //cacher tous les textes de cette étape
-
-    step.querySelectorAll('.text').forEach(text=>{text.classList.add('hidden');
-
-    });
-
-    //afficher le texte sélectionné
-    document.getElementById(textId).classList.remove('hidden');
-}
-
-function unselect () {
-
-const unselect = document.querySelectorAll('.checkbox'); // Sélectionne seulement les boutons actifs
-unselect.forEach(button => {
-    button.classList.remove('crossed', 'checked'); // Retire la classe active de chaque bouton
-    button.innerHTML="";
-});
-}
-
-function showButtons(clickedButton) {
-    const group = clickedButton.getAttribute("data-group");
-    const allButtons = document.querySelectorAll('.step[data-step="3"] .btnGroup .btn');
-
-    // Cache tous les boutons au départ
-    allButtons.forEach(btn => {
-        btn.classList.add('hidden');
-    });
-
-    // Montre uniquement les boutons associés au groupe cliqué
-    const relatedButtons = document.querySelectorAll(`.step[data-step="3"] .btnGroup .btn[data-group="${group}"], .step[data-step="3"] .btnGroup .btn.${group}`);
-    relatedButtons.forEach(btn => {
-        btn.classList.remove('hidden');
-
-            // Cache le bouton cliqué  
-    clickedButton.classList.add('hidden');
-    });
-}
-
-
-// Fonction pour revenir au groupe de boutons précédent
-function goBackToGroup() {
- // Cacher les boutons spécifiques (qui étaient affichés précédemment)
- const specificButtons = document.querySelectorAll('.step[data-step="3"] .btn');
- specificButtons.forEach(btn => {
-     btn.classList.add('hidden'); // Cache les boutons qui ne doivent pas être affichés
- });
-
-    // Afficher tous les boutons de l'étape 3
-    const allButtons = document.querySelectorAll('.step[data-step="3"] .main');
-    allButtons.forEach(main => {
-        main.classList.remove('hidden', 'orange'); // Montre tous les boutons
-    });
-
-    allButtons.forEach(main => {
-        main.classList.remove('hidden', 'orange'); // Montre tous les boutons
-    });
-
-    const variable = document.querySelectorAll(`.variable`);
-    variable.forEach(element =>{
-        element.classList.add('hidden');
-    });
-    const children = parentElement.querySelectorAll('*'); // Sélectionne tous les enfants
-    children.forEach((child) => {
-        child.classList.add('hidden');
-    });
-}
-
-    document.querySelectorAll('.btn4').forEach(button=>{
-        button.addEventListener('click', function placements(){
-            this.classList.toggle('active');
-            this.classList.toggle('hidden');
+    // A. Gestion des Boites (Verif RGPD)
+    document.querySelectorAll('.verif-box').forEach(box => {
+        box.addEventListener('click', function() {
+            const status = this.dataset.status;
+            this.dataset.status = (status === 'checked') ? 'none' : 'checked';
+            this.innerHTML = (this.dataset.status === 'checked') ? '✔' : '';
+            outputContainer.classList.add('hidden');
+        });
+        box.addEventListener('dblclick', function(e) {
+            e.preventDefault();
+            const status = this.dataset.status;
+            this.dataset.status = (status === 'crossed') ? 'none' : 'crossed';
+            this.innerHTML = (this.dataset.status === 'crossed') ? '✖' : '';
+            outputContainer.classList.add('hidden');
         });
     });
 
-function toggleCheck(element) {
-    element.classList.remove("crossed"); // Supprime la classe 'crossed'
-    element.classList.add("checked"); // Ajoute la classe 'checked'
-    element.innerHTML = "✔"; // Affiche une coche
-}
-
-function toggleCross(element) {
-    element.classList.remove("checked"); // Supprime la classe 'checked'
-    element.classList.add("crossed"); // Ajoute la classe 'crossed'
-    element.innerHTML = "✖"; // Affiche une croix
-}
-
-document.getElementById("validerTracage").addEventListener("click", function () {
-    const tracageVisible = document.querySelectorAll('[data-tracage]:not(.hidden)');
-    const tracageFinal = [];
-
-    tracageVisible.forEach(element => {
-        const dataTracage = element.getAttribute('data-tracage');
-        if (dataTracage) {
-            tracageFinal.push(dataTracage);
-        }
-    });
-
-    const placementsDisplay = document.getElementById('placementsDisplay');
-    // Afficher chaque tracage récupéré sur une ligne différente
-    placementsDisplay.innerHTML = tracageFinal.join('<br>');
-    placementsDisplay.classList.remove('hidden');
-
-    const tracageBox = document.getElementById('tracageBox');
-    tracageBox.classList.remove('hidden');
-
-    let tracageDisplay = document.getElementById("tracageDisplay");
-    tracageDisplay.innerHTML = ""; // Réinitialiser le contenu du tracage à chaque appel
-
-    // Vérification des demandes techniques et ajout des informations de tracage
-    let tracageMessage = ""; // Variable pour accumuler les messages de tracage
-
-    // Vérification de la demande SPID
-    if (document.getElementById("spid").checked) {
-        const spidNumber = document.getElementById("spidNumber").value;
-        if (spidNumber) {
-            tracageMessage += `J'ai fait une demande SPID : ${spidNumber}<br>`;
-        } else {
-            tracageMessage += `La demande SPID a été cochée, mais aucun numéro n'a été saisi.<br>`;
-        }
-    }
-
-    // Vérification de la demande ENEDIS
-    if (document.getElementById("enedis").checked) {
-        const enedisNumber = document.getElementById("enedisNumber").value;
-        if (enedisNumber) {
-            tracageMessage += `J'ai fait une demande ENEDIS : ${enedisNumber}<br>`;
-        } else {
-            tracageMessage += `La demande ENEDIS a été cochée, mais aucun numéro n'a été saisi.<br>`;
-        }
-    }
-
-    // Vérification de la demande GRDF
-    if (document.getElementById("grdf").checked) {
-        const grdfNumber = document.getElementById("grdfNumber").value;
-        if (grdfNumber) {
-            tracageMessage += `J'ai fait une demande GRDF : ${grdfNumber}<br>`;
-        } else {
-            tracageMessage += `La demande GRDF a été cochée, mais aucun numéro n'a été saisi.<br>`;
-        }
-    }
-
-    // Si des messages de tracage ont été générés, les afficher dans tracageDisplay
-    if (tracageMessage) {
-        tracageDisplay.innerHTML = tracageMessage;
-        tracageDisplay.classList.remove("hidden"); // Afficher l'élément tracageDisplay
-    }
-})
-
-
-document.getElementById("validerTracage").addEventListener("click", function () {
-    const confirmationLines = document.querySelectorAll('.confirmationLine:not(.hidden)');
-    let uncheckedNames = [];
-    
-    confirmationLines.forEach(line => {
-        const checkbox = line.querySelector('.checkbox');
-        if (checkbox.classList.contains('crossed')) {
-            // Ajoute le nom à la liste si la case n'est pas cochée
-            uncheckedNames.push(checkbox.getAttribute('data-name'));
-        }
-    });
-
-    // Si aucune case n'est cochée, ne rien ajouter dans data-tracage
-    if (uncheckedNames.length === 0) {
-        // Ne rien faire ou gérer le traçage comme vide
-        return; // On sort de la fonction si aucune case n'est cochée
-    } else {
-        // Sélectionner un élément spécifique pour mettre à jour l'attribut data-tracage
-        const firstLine = confirmationLines[0]; // Ou tout autre élément selon votre besoin
-        const tracage = `Identification échouée pour : ${uncheckedNames.join(', ')}`;
-        firstLine.setAttribute('data-tracage', tracage); // Mettre à jour l'attribut data-tracage
-    }
-
-    // Vous pouvez ensuite mettre ce message dans un élément HTML si besoin
-    const tracageDisplay = document.getElementById('tracageDisplay');
-    tracageDisplay.innerHTML = `Message: ${tracage}`; // Affichage dans le tracageDisplay
-})
-
-document.querySelectorAll('.nextStep').forEach(button => {
-    button.addEventListener('click', () => {
-
-        const speechContainer = document.querySelector('#conteneur');
-
-        // Récupérer l'élément cliqué
-        const clickedElement = event.target;
-
-        // Récupérer l'ID de l'élément cliqué
-        const elementId = clickedElement.id;
-
-        // Ajouter ".html" après l'ID
-        const fileName = elementId + ".html";
-
-        // Utiliser fetch pour récupérer le contenu
-        fetch(fileName)
-            .then(response => {
-                return response.text();
-            })
-            .then(htmlContent => {
-                // Insérer le contenu récupéré dans l'élément HTML
-                speechContainer.innerHTML = htmlContent;
-
-                // Exécuter les scripts inclus dans le contenu chargé
-                const scripts = speechContainer.querySelectorAll('script');
-                scripts.forEach(oldScript => {
-                    const newScript = document.createElement('script');
-                    // Copier les attributs du script original
-                    Array.from(oldScript.attributes).forEach(attr => {
-                        newScript.setAttribute(attr.name, attr.value);
+    // B. Boutons Identification (Étape 1)
+    buttons.forEach(button => {
+        button.addEventListener('click', function() {
+            const targetId = this.dataset.target;
+            
+            // Gestion classe active
+            buttons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Affichage bloc vérification
+            verifBlocks.forEach(block => {
+                if (block.id === targetId) {
+                    block.classList.remove('hidden');
+                } else {
+                    block.classList.add('hidden');
+                    // Reset des cases des autres blocs
+                    block.querySelectorAll('.verif-box').forEach(box => { 
+                        box.dataset.status = 'none'; 
+                        box.innerHTML = ''; 
                     });
-                    // Copier le contenu du script
-                    newScript.textContent = oldScript.textContent;
-                    // Remplacer l'ancien script
-                    oldScript.replaceWith(newScript);
-                });
-
-                // Appliquer les styles intégrés si nécessaire
-                const styles = speechContainer.querySelectorAll('style');
-                styles.forEach(style => {
-                    const newStyle = document.createElement('style');
-                    newStyle.textContent = style.textContent;
-                    newStyle.classList.add('dynamic-style'); // Ajoute une classe pour permettre leur suppression
-                    document.head.appendChild(newStyle);
-                });
+                }
             });
-    });
-});
-
-// Gestion du bouton de suppression
-document.getElementById('backButton').addEventListener('click', () => {
-    // Supprimer tous les scripts dynamiques ajoutés
-    const dynamicScripts = document.querySelectorAll('#conteneur script');
-    dynamicScripts.forEach(script => script.remove());
-
-    // Supprimer tous les styles dynamiques ajoutés
-    const dynamicStyles = document.querySelectorAll('style.dynamic-style');
-    dynamicStyles.forEach(style => style.remove());
-
-    // Supprimer le contenu de l'élément conteneur
-    const speechContainer = document.querySelector('#conteneur');
-    speechContainer.innerHTML = '';
-    const aideTracage = document.querySelector('#aideTracage');
-    aideTracage.innerHTML='';
-    const hideDisplay = document.querySelector('#messageDisplay');
-    hideDisplay.classList.add('hidden');
-});
-
-document.addEventListener("DOMContentLoaded", function () {
-    const gallerie = document.getElementById("gallerie");
-    const relevesbtn = document.getElementById("relevesButton");
-    const imageRoot = relevesbtn.getAttribute("data-image-root");
-    const imageNumber = parseInt(relevesbtn.getAttribute("data-image-number"), 10);
-    
-    const modal = document.getElementById("imageModal");
-    const modalImage = document.getElementById("modalImage");
-    const closeModal = document.querySelector(".close");
-    const prevButton = document.querySelector(".prev");
-    const nextButton = document.querySelector(".next");
-
-    let currentImageIndex = 0;
-
-    // Générer les miniatures
-    for (let i = 1; i <= imageNumber; i++) {
-        const img = document.createElement("img");
-        img.src = `${imageRoot}${i}.png`;
-        img.alt = `Image ${i}`;
-        img.dataset.index = i - 1; // Stocker l'index de l'image
-        img.addEventListener("click", openModal);
-        gallerie.appendChild(img);
-    }
-
-    // Fonction pour ouvrir le modal
-    function openModal(event) {
-        currentImageIndex = parseInt(event.target.dataset.index, 10);
-        showImage(currentImageIndex);
-        modal.style.display = "flex";
-    }
-
-    // Fonction pour afficher une image dans le modal
-    function showImage(index) {
-        modalImage.src = `${imageRoot}${index + 1}.png`;
-    }
-
-    // Fermer le modal
-    closeModal.addEventListener("click", function () {
-        modal.style.display = "none";
-    });
-
-    // Naviguer vers l'image précédente
-    prevButton.addEventListener("click", function () {
-        currentImageIndex = (currentImageIndex - 1 + imageNumber) % imageNumber;
-        showImage(currentImageIndex);
-    });
-
-    // Naviguer vers l'image suivante
-    nextButton.addEventListener("click", function () {
-        currentImageIndex = (currentImageIndex + 1) % imageNumber;
-        showImage(currentImageIndex);
-    });
-
-    // Fermer le modal en cliquant à l'extérieur de l'image
-    modal.addEventListener("click", function (event) {
-        if (event.target === modal) {
-            modal.style.display = "none";
-        }
-    });
-});
-
-document.querySelectorAll('.nextStep').forEach(button => {
-    button.addEventListener('click', () => {
-    
-    const speechContainer = document.querySelector('#aideTracage');
-
-     // Récupérer l'élément cliqué
-     const clickedElement = event.target;
-
-     // Récupérer l'ID de l'élément cliqué
-    const elementId = clickedElement.id;
-
-       // Ajouter ".html" après l'ID
-       const fileName = elementId + "aide" +".html";
-
-    // Utiliser fetch pour récupérer le contenu de 2.html
-    fetch(fileName)
-        .then(response => {
-            return response.text();
-        })
-        .then(htmlContent => {
-            // Insérer le contenu récupéré dans l'élément HTML
-            speechContainer.innerHTML = htmlContent;
-
-            // Exécuter les scripts inclus dans le contenu chargé
-            const scripts = speechContainer.querySelectorAll('script');
-            scripts.forEach(oldScript => {
-                const newScript = document.createElement('script');
-                // Copier les attributs du script original
-                Array.from(oldScript.attributes).forEach(attr => {
-                    newScript.setAttribute(attr.name, attr.value);
-                });
-                // Copier le contenu du script
-                newScript.textContent = oldScript.textContent;
-                // Remplacer l'ancien script
-                oldScript.replaceWith(newScript);
-            });
-
-            // Appliquer les styles intégrés si nécessaire (facultatif)
-            const styles = speechContainer.querySelectorAll('style');
-            styles.forEach(style => {
-                const newStyle = document.createElement('style');
-                newStyle.textContent = style.textContent;
-                document.head.appendChild(newStyle);
-            });
+            
+            // Afficher TOUTES les étapes suivantes
+            motifSection.classList.remove('hidden');
+            separators.forEach(sep => sep.classList.remove('hidden'));
+            arborescenceSection.classList.remove('hidden'); 
+            suiviDemandeSection.classList.remove('hidden');
+            bilanAppelSection.classList.remove('hidden');
+            
+            outputContainer.classList.add('hidden');
         });
-})
-const makeappear = document.getElementById('messageDisplay');
-makeappear.classList.remove('hidden');
+    });
 
-});
+    // C. Boutons Motif (Étape 2)
+    motifButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            motifButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            selectedMotif = this.dataset.motif;
+            outputContainer.classList.add('hidden');
+        });
+    });
 
-//copier le texte de traçage en un clic gauche
-// Fonction pour copier le texte de la zone tracageDisplay
-document.getElementById("tracageDisplay").addEventListener("click", function() {
-    // Crée un élément temporaire de type texte
-    const range = document.createRange();
-    range.selectNodeContents(this);
-    
-    // Sélectionne le texte de la zone
-    const selection = window.getSelection();
-    selection.removeAllRanges();
-    selection.addRange(range);
-    
-    // Tente de copier le texte dans le presse-papiers
-    try {
-        document.execCommand('copy');
-        alert("Le texte a été copié !");
-    } catch (err) {
-        console.error("Erreur lors de la copie : ", err);
-    }
-    
-    // Désélectionne le texte après la copie
-    selection.removeAllRanges();
-});
-
-document.getElementById('backButton').addEventListener('click', ()=> {
-    const hideTracage = document.querySelector('#tracageBox');
-    hideTracage.classList.add('hidden');
-})
-
-const buttons = document.querySelectorAll('.typeTracage');
-
-buttons.forEach(button => {
-    button.addEventListener('click', function() {
-        // Récupérer la date et l'heure actuelles  
-        const now = new Date();
-        const dateString = now.toLocaleString();
-
-        // Mettre à jour le data-tracage  
-        if (this.textContent.trim() === 'Demande') {
-            this.setAttribute('data-tracage', `Le client a formulé une demande le ${dateString}`);
-        } else if (this.textContent.trim() === 'Réclamation') {
-            this.setAttribute('data-tracage', `Le client a formulé une réclamation le ${dateString}`);
+    // D. Arborescence (Étape 3)
+    categoriesContainer.addEventListener('click', function(e) {
+        if (e.target.classList.contains('category-button')) {
+            // Gestion boutons catégories
+            categoriesContainer.querySelectorAll('.category-button').forEach(btn => btn.classList.remove('active'));
+            e.target.classList.add('active');
+            
+            const catKey = e.target.dataset.category;
+            const subs = arborescence[catKey].sub;
+            
+            // Remplir sous-catégories
+            subcategoriesContainer.innerHTML = '';
+            subcategoriesContainer.classList.remove('hidden');
+            actionArea.classList.add('hidden');
+            
+            for (const key in subs) {
+                const btn = document.createElement('button');
+                btn.className = 'category-button';
+                btn.dataset.file = subs[key].file;
+                btn.textContent = subs[key].label;
+                subcategoriesContainer.appendChild(btn);
+            }
+            outputContainer.classList.add('hidden');
         }
+    });
 
-        // Annuler le data-tracage de l'autre bouton  
-        buttons.forEach(btn => {
-            if (btn !== this) {
-                btn.setAttribute('data-tracage', '');
+    subcategoriesContainer.addEventListener('click', function(e) {
+        if (e.target.classList.contains('category-button')) {
+            subcategoriesContainer.querySelectorAll('.category-button').forEach(btn => btn.classList.remove('active'));
+            e.target.classList.add('active');
+            // CHARGER LE MODULE EXTERNE
+            loadExternalModule(e.target.dataset.file);
+            outputContainer.classList.add('hidden');
+        }
+    });
+
+    // E. Suivi de la demande (Étape 4)
+    // Calcul date automatique
+    function calculateRecontactDate() {
+        const today = new Date();
+        let futureDate = new Date();
+        futureDate.setDate(today.getDate() + 15);
+        if (futureDate.getDay() === 0) futureDate.setDate(futureDate.getDate() + 1);
+        return futureDate.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    }
+
+    document.querySelectorAll('.suivi-header input[type="checkbox"]').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const contentId = this.dataset.target;
+            const contentDiv = document.getElementById(contentId);
+            const headerDiv = this.closest('.suivi-header');
+            
+            if (this.checked) {
+                contentDiv.classList.remove('hidden');
+                headerDiv.classList.add('open');
+                if (this.id === 'check-otd') document.getElementById('otd-date').value = calculateRecontactDate();
+            } else {
+                contentDiv.classList.add('hidden');
+                headerDiv.classList.remove('open');
+                contentDiv.querySelectorAll('input, textarea').forEach(i => i.value = '');
+            }
+            outputContainer.classList.add('hidden');
+        });
+    });
+
+    // F. Bilan (Étape 5) - Gestion Clic Droit/Gauche/Double
+    document.querySelectorAll('.bilan-box').forEach(box => {
+        box.addEventListener('click', function() {
+            const status = this.dataset.status;
+            this.dataset.status = (status === 'checked') ? 'none' : 'checked';
+            this.innerHTML = (this.dataset.status === 'checked') ? '✔' : '';
+        });
+        box.addEventListener('dblclick', function(e) {
+            e.preventDefault();
+            this.dataset.status = 'crossed';
+            this.innerHTML = '✖';
+        });
+        box.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            const status = this.dataset.status;
+            this.dataset.status = (status === 'proposed') ? 'none' : 'proposed';
+            this.innerHTML = (this.dataset.status === 'proposed') ? 'ℹ' : '';
+        });
+    });
+
+    // --- 6. GÉNÉRATION DU TRAÇAGE FINAL ---
+    generateButton.addEventListener('click', function() {
+        
+        // Vérifications
+        const activeIdBtn = document.querySelector('.id-button.active');
+        if (!activeIdBtn) { alert("Veuillez sélectionner un mode d'identification (Étape 1)."); return; }
+        if (!selectedMotif) { alert("Veuillez sélectionner un motif (Étape 2)."); return; }
+
+        // 1. RGPD
+        const shortMode = activeIdBtn.dataset.shortMode;
+        const activeBlock = document.getElementById(activeIdBtn.dataset.target);
+        const boxes = activeBlock.querySelectorAll('.verif-box');
+        let red = [], greenCount = 0;
+        boxes.forEach(b => {
+            if(b.dataset.status === 'crossed') red.push(b.nextElementSibling.textContent.trim());
+            if(b.dataset.status === 'checked') greenCount++;
+        });
+
+        let trace = `Client ${shortMode === 'non identifié' ? shortMode : 'identifié par ' + shortMode}`;
+        if (red.length > 0) trace += ` et RGPD échouée sur :\n` + red.map(r => ` - ${r}`).join('\n');
+        else if (greenCount === boxes.length) trace += ` et RGPD OK\n`;
+        else trace += ` - Vérification RGPD incomplète.\n`;
+
+        // 2. Motif & Date
+        const now = new Date();
+        const dateStr = now.toLocaleDateString('fr-FR');
+        const timeStr = now.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
+        trace += `\n${selectedMotif.charAt(0).toUpperCase() + selectedMotif.slice(1)} adressée le ${dateStr} à ${timeStr}.\n`;
+
+        // 3. Action (Variable globale remplie par le module)
+        trace += window.traceAction ? `\n${window.traceAction}\n` : `\n⚠ Aucune action spécifique sélectionnée.\n`;
+
+        // 4. Suivi
+        let traceSuivi = "";
+        document.querySelectorAll('.suivi-header input[type="checkbox"]:checked').forEach(cb => {
+            if (cb.id !== 'check-otd') {
+                const val = document.getElementById(cb.dataset.target).querySelector('input').value;
+                if (val) traceSuivi += `- ${cb.nextElementSibling.textContent.trim()}: ${val}\n`;
             }
         });
-    });
-});
+        if (document.getElementById('check-otd').checked) {
+            traceSuivi += `- OTD: Superviseur (${document.getElementById('otd-superviseur').value}), Détails (${document.getElementById('otd-details').value}), Recontact (${document.getElementById('otd-date').value})\n`;
+        }
+        if (traceSuivi) trace += `\n--- SUIVI ---\n${traceSuivi}`;
 
-// Fonction pour afficher/masquer le champ de référence
-function toggleReferenceField(checkbox, referenceId) {
-    const referenceField = document.getElementById(referenceId);
-    if (checkbox.checked) {
-        referenceField.classList.remove('hidden');
-    } else {
-        referenceField.classList.add('hidden');
-    }
-}
+        // 5. Bilan
+        let souscrits = [], relations = [], refuses = [], proposes = [];
+        document.querySelectorAll('.bilan-box').forEach(box => {
+            const label = box.dataset.label;
+            const type = box.dataset.type;
+            const status = box.dataset.status;
+
+            if (status === 'checked') {
+                if (type === 'sub') souscrits.push(label);
+                else relations.push(label);
+            } else if (status === 'crossed') refuses.push(label);
+            else if (status === 'proposed') proposes.push(label);
+        });
+
+        if (souscrits.length > 0 || relations.length > 0 || refuses.length > 0 || proposes.length > 0) {
+            trace += `\n--- BILAN DE L'APPEL ---\n`;
+            if (souscrits.length > 0) trace += `Le client a souscrit à : ${souscrits.join(', ')}\n`;
+            if (relations.length > 0) trace += `Le client a demandé à être mis en relation avec : ${relations.join(', ')}\n`;
+            if (refuses.length > 0) trace += `Le client a refusé : ${refuses.join(', ')}\n`;
+            if (proposes.length > 0) trace += `Proposition faite pour : ${proposes.join(', ')}\n`;
+        }
+
+        // Affichage final
+        outputTextarea.value = trace;
+        outputContainer.classList.remove('hidden');
+    });
+
+});

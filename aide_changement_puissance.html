@@ -1,0 +1,188 @@
+<div class="module-wrapper">
+    
+    <h3 class="module-title">💡 Aide : Changement de puissance</h3>
+
+    <p>Pour un changement de puissance, vérifier si le client est en Linky.</p>
+
+    <div class="form-group">
+        <label>Puissance ACTUELLE du client :</label>
+        <div class="power-select-group">
+            <select id="mod-power-current">
+                <option value="">-- Sélectionner --</option>
+                <option value="3kVA">3 kVA</option>
+                <option value="6kVA">6 kVA</option>
+                <option value="9kVA">9 kVA</option>
+                <option value="12kVA">12 kVA</option>
+                <option value="15kVA">15 kVA</option>
+                <option value="18kVA">18 kVA</option>
+                <option value="24kVA">24 kVA</option>
+                <option value="30kVA">30 kVA</option>
+                <option value="36kVA">36 kVA</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>NOUVELLE puissance demandée :</label>
+        <div class="power-select-group">
+            <select id="mod-power-new">
+                <option value="">-- Sélectionner --</option>
+                <option value="3kVA">3 kVA</option>
+                <option value="6kVA">6 kVA</option>
+                <option value="9kVA">9 kVA</option>
+                <option value="12kVA">12 kVA</option>
+                <option value="15kVA">15 kVA</option>
+                <option value="18kVA">18 kVA</option>
+                <option value="24kVA">24 kVA</option>
+                <option value="30kVA">30 kVA</option>
+                <option value="36kVA">36 kVA</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>Date souhaitée / Programmée :</label>
+        <div class="power-select-group">
+            <input type="date" id="mod-power-date">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <input type="checkbox" id="mod-fees-check" style="transform: scale(1.2); cursor: pointer;">
+            <label for="mod-fees-check" style="margin: 0; cursor: pointer; font-weight: bold; color: #333;">Des frais sont-ils à prévoir ?</label>
+        </div>
+        
+        <div id="mod-fees-input-group" class="hidden" style="margin-top: 15px; border-top: 1px solid #eee; padding-top: 10px;">
+            <label>Montant des frais annoncés (€) :</label>
+            <input type="text" id="mod-fees-amount" placeholder="Ex: 3,71 €" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+        </div>
+    </div>
+    
+    <h3>Galerie (Miniatures) :</h3>
+    <div id="mod-gallery" class="gallery-grid"></div>
+
+    <div id="mod-lightbox" class="lightbox-overlay">
+        <span class="lightbox-close">&times;</span>
+        <div class="lightbox-content">
+            <img id="lightbox-full-img" src="">
+        </div>
+    </div>
+
+</div>
+
+<style>
+    .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; margin-top: 10px; }
+    .thumb-img { width: 100%; height: 100px; object-fit: cover; border-radius: 4px; border: 2px solid #eee; cursor: zoom-in; transition: transform 0.2s, border-color 0.2s; background-color: #f0f0f0; }
+    .thumb-img:hover { transform: scale(1.05); border-color: #007bff; }
+    .lightbox-overlay { display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9); backdrop-filter: blur(5px); }
+    .lightbox-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); max-width: 90%; max-height: 90%; }
+    #lightbox-full-img { max-width: 100%; max-height: 90vh; border-radius: 4px; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+    .lightbox-close { position: absolute; top: 20px; right: 30px; color: white; font-size: 40px; cursor: pointer; }
+</style>
+
+<script>
+(function() {
+    const currentSelect = document.getElementById('mod-power-current');
+    const newSelect = document.getElementById('mod-power-new');
+    const dateInput = document.getElementById('mod-power-date');
+    
+    // Éléments pour les frais
+    const feesCheck = document.getElementById('mod-fees-check');
+    const feesGroup = document.getElementById('mod-fees-input-group');
+    const feesAmount = document.getElementById('mod-fees-amount');
+
+    const gallery = document.getElementById('mod-gallery');
+    const lightbox = document.getElementById('mod-lightbox');
+    const fullImg = document.getElementById('lightbox-full-img');
+    const closeBtn = document.querySelector('.lightbox-close');
+
+    // 1. TRAÇAGE
+    function updateTrace() {
+        const currentVal = currentSelect.value;
+        const newVal = newSelect.value;
+        const dateVal = dateInput.value;
+
+        if(newVal) {
+            let txt = `Demande de changement de puissance`;
+            if (currentVal) txt += ` de ${currentVal}`;
+            txt += ` vers ${newVal}`;
+
+            // Ajout de la date
+            if (dateVal) {
+                const dateObj = new Date(dateVal);
+                const dateFr = dateObj.toLocaleDateString('fr-FR');
+                txt += ` pour le ${dateFr}.`;
+            } else {
+                txt += ` (Date non renseignée).`;
+            }
+            
+            // Gestion des frais
+            if (feesCheck.checked) {
+                const amount = feesAmount.value.trim();
+                if (amount) {
+                    txt += ` Frais annoncés : ${amount}€.`;
+                } else {
+                    txt += ` Frais annoncés (montant non saisi).`;
+                }
+            }
+
+            window.traceAction = txt;
+        } else {
+            window.traceAction = "";
+        }
+    }
+    
+    // Écouteurs
+    currentSelect.addEventListener('change', updateTrace);
+    newSelect.addEventListener('change', updateTrace);
+    dateInput.addEventListener('change', updateTrace); // Écouteur pour la date
+    
+    feesCheck.addEventListener('change', function() {
+        if (this.checked) {
+            feesGroup.classList.remove('hidden');
+        } else {
+            feesGroup.classList.add('hidden');
+            feesAmount.value = "";
+        }
+        updateTrace();
+    });
+
+    feesAmount.addEventListener('input', updateTrace);
+
+
+    // 2. LIGHTBOX
+    function openLightbox(src) { fullImg.src = src; lightbox.style.display = 'block'; }
+    function closeLightbox() { lightbox.style.display = 'none'; fullImg.src = ''; }
+    closeBtn.addEventListener('click', closeLightbox);
+    lightbox.addEventListener('click', (e) => { if(e.target === lightbox) closeLightbox(); });
+
+    // 3. IMAGES
+    const imageFolder = 'aide_changement_puissance/';
+    const maxImagesToCheck = 20; 
+    const extensions = ['.jpg', '.png', '.jpeg'];
+
+    function tryLoadImage(index) {
+        extensions.forEach(ext => {
+            const src = `${imageFolder}${index}${ext}`;
+            const img = new Image();
+            img.src = src;
+            img.onload = function() {
+                const thumb = document.createElement('img');
+                thumb.src = src;
+                thumb.className = 'thumb-img';
+                thumb.alt = `Doc ${index}`;
+                thumb.onclick = () => openLightbox(src);
+                gallery.appendChild(thumb);
+            };
+        });
+    }
+    for (let i = 1; i <= maxImagesToCheck; i++) { tryLoadImage(i); }
+
+    // 4. NETTOYAGE
+    window.currentModuleCleanup = function() {
+        window.traceAction = "";
+    };
+
+})();
+</script>

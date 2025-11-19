@@ -1,297 +1,138 @@
-h1{
-    font-size: 20px;
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
-    font-weight: bold;
-    text-align: center;
-    margin-top: 10px;
-}
-
-h2{
-    margin: 20px 0 5PX 2px;
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
-    font-size: 14px;
-    text-align: center;
-}
-
-body{
-    background-color: rgb(222, 222, 225);
-}
-
-.btnGroup{
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin: 10px;
-}
-
-.btn{
-    background-color: blue;
-    padding: 5px 10px;
-    color: white;
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
-    font-size: 16px;
-    transition: background-color 0.3s;
-}
-
-.btn:hover{
-    background-color: darkblue;
-}
-
-.btn.orange{
-    background-color: orange;
-}
-
-.text{
-    text-align: center;
-}
-
-.underline {
-    text-decoration: underline;
-    display: block;
-    margin: 5px;
-}
-
-.hidden{
-    display: none;
-}
-
-.step[data-step="3"] {
-    display: flex; /* Utiliser Flexbox pour centrer */
-    justify-content: center; /* Centre horizontalement */
-    align-items: center; /* Centre verticalement */
-}
-
-.step[data-step="3"] .btnGroup {
-    display: flex; /* Utiliser Flexbox pour btnGroup */
-    flex-wrap: wrap; /* Permet aux boutons de passer à la ligne */
-    justify-content: center; /* Centre les boutons dans le conteneur */
-    gap: 10px; /* Espacement entre les boutons */
-    margin: 10px; /* Ajustez le margin selon vos besoins */
-    max-width: 60%; /* Empêche le débordement du conteneur */
-}
-
-.step[data-step="3"] .btn {
-    flex: 1 1 calc(33.33% - 10px); /* Chaque bouton prend 1/3 de la largeur, moins l'espace */
-    box-sizing: border-box; /* Inclut le padding et la bordure dans la largeur totale */
-    margin: 0; /* Supprime les marges externes */
-    padding: 10px; /* Ajoutez du padding pour le style */
-    height: 40px;
-    white-space: nowrap;
-    max-width: 33%;
-    min-width: 250px;
-}
-
-.nextStep {
-    display: flex; /* Utiliser Flexbox pour centrer */
-    justify-content: center; /* Centre horizontalement */
-    align-items: center; /* Centre verticalement */
-}
-
-.nextStep .btnGroup {
-    display: flex; /* Utiliser Flexbox pour btnGroup */
-    flex-wrap: wrap; /* Permet aux boutons de passer à la ligne */
-    justify-content: center; /* Centre les boutons dans le conteneur */
-    gap: 10px; /* Espacement entre les boutons */
-    margin: 10px; /* Ajustez le margin selon vos besoins */
-    max-width: 60%; /* Empêche le débordement du conteneur */
-}
-
-.nextStep .btn {
-    flex: 1 1 calc(33.33% - 10px); /* Chaque bouton prend 1/3 de la largeur, moins l'espace */
-    box-sizing: border-box; /* Inclut le padding et la bordure dans la largeur totale */
-    margin: 0; /* Supprime les marges externes */
-    padding: 10px; /* Ajoutez du padding pour le style */
-    height: 40px;
-    white-space: nowrap;
-    max-width: 33%;
-    min-width: 250px;
-}
-
-.step[data-step="4"]{
+/* --- GLOBAL --- */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: #f4f7f6;
+    color: #333;
+    margin: 0;
+    padding: 20px;
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-direction: column;
+    min-height: 90vh;
 }
 
-.step[data-step="4"] .btnGroup{
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 10px;
-    margin: 10px;
-}
-
-.btn4{
-    border: 5;
-    border-color: #ffb60b;
-    background-color: white;
-    color: black;
-    font-size: 12px;
-    min-height: 50px;
-    min-width: 50px;
-    max-width: 80px;
-    border-radius: 50%;
-    text-align: center;
-    white-space: normal;
-    display: inline-block;
-    box-sizing: border-box;
-    transition: background-color 0.3s, color 0.3s;
-    cursor: pointer;
-}
-
-.btn4:hover{
-    background-color: #ffb60b;
-}
-
-.btn4.active{
-    background-color: #ffb60b;
-}
-
-#backButton {
-    display: block;
-    margin: 20px auto;
-
-}
-
-#messageDisplay, #tracageBox {
-    width: 70%;
-    margin: 0 auto;
-    margin-top: 20px;
-    padding: 10px;
-    background-color: #f0f0f0;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-}
-
-#messageDisplay img {
-    margin : 5px;
-    width: 20%;
-    height: 100px;
-}
-
-.checkbox {
-    width: 15px;
-    height: 15px;
-    border: 2px solid #333;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 16px;
-    color: green;
-    margin-left: 10px;
-}
-
-.checked {
-    background-color: green;
-    color: white;
-}
-
-.crossed {
-    background-color: red;
-    color: white;
-}
-
-#textBoxDisplay{
-    width: 30%;
-    margin: 0 auto;
-    margin-top: 20px;
-    padding: 10px;
-    background-color: #f0f0f0;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-}
-
-.btn4.hidden{
-    display: block;
-}
-
-#menuDeroulant {
-    margin: 10px 0;
-}
-
-#menuDeroulant label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-}
-
-#optionsReleve {
-    padding: 5px;
-    font-size: 16px;
-}
-
-#gallerie {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-
-#gallerie img {
-    width: 100px;
-    height: 100px;
-    object-fit: cover;
-    cursor: pointer;
-}
-
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
+.container {
+    max-width: 700px;
     width: 100%;
-    height: 100%;
-    overflow: hidden;
-    background-color: rgba(0, 0, 0, 0.8);
-    justify-content: center;
-    align-items: center;
+    margin: 0 auto;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    padding: 30px;
 }
 
-.modal-content {
-    max-width: 90%;
-    max-height: 80%;
+h1, h2 {
+    color: #0047a0;
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 25px;
 }
+h2 { margin-top: 25px; border-top: 1px solid #eee; padding-top: 20px; }
+hr { border: 0; height: 1px; background: #eee; margin: 25px 0; }
 
-.close {
-    position: absolute;
-    top: 10px;
-    right: 20px;
-    color: white;
-    font-size: 30px;
+/* --- BOUTONS NAVIGATION --- */
+.button-group, .motif-group {
+    display: grid; gap: 10px; margin-bottom: 25px;
+}
+.button-group { grid-template-columns: 1fr 1fr 1fr; }
+.motif-group { grid-template-columns: 1fr 1fr; }
+
+.id-button, .motif-button, .category-button {
+    background-color: #f0f0f0;
+    color: #333;
+    border: 2px solid #ccc;
+    padding: 15px 10px;
+    border-radius: 6px;
     cursor: pointer;
+    font-size: 1em;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    text-align: center;
 }
+.id-button.active { background-color: #0047a0; color: white; border-color: #0047a0; }
+.motif-button.active { background-color: #28a745; color: white; border-color: #28a745; }
+.category-button.active { background-color: #0047a0; color: white; border-color: #0047a0; }
 
-.prev, .next {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    color: white;
-    font-size: 40px;
-    background: none;
-    border: none;
-    cursor: pointer;
+.id-button:hover, .motif-button:hover, .category-button:hover { background-color: #e0e0e0; }
+
+/* --- ÉTAPE 1 : BOITES VÉRIFICATION RGPD --- */
+.verif-block { border: 1px dashed #aaa; border-radius: 6px; padding: 20px; background-color: #fdfdfd; }
+.verif-item { display: flex; align-items: center; gap: 12px; margin-bottom: 15px; font-size: 1.1em; user-select: none; }
+
+/* LE STYLE DES BOITES (IMPORTANT) */
+.verif-box { 
+    width: 24px; height: 24px; 
+    border: 2px solid #555; border-radius: 4px; 
+    cursor: pointer; 
+    display: flex; align-items: center; justify-content: center; 
+    font-size: 18px; font-weight: bold; flex-shrink: 0; 
+    background-color: white;
 }
+.verif-box[data-status="checked"] { background-color: #e6ffed; border-color: #28a745; color: #28a745; }
+.verif-box[data-status="crossed"] { background-color: #fff0f0; border-color: #dc3545; color: #dc3545; }
 
-.prev {
-    left: 20px;
+
+/* --- ÉTAPE 3 : MODULES EXTERNES --- */
+.action-block { border: 1px solid #ddd; border-radius: 6px; padding: 20px; background-color: #f9f9f9; margin-top: 15px; }
+.form-group { margin-bottom: 20px; padding: 10px; border: 1px dashed #ccc; border-radius: 4px; }
+.form-group label { display: block; font-weight: 600; margin-bottom: 8px; color: #0047a0; }
+.power-select-group { display: flex; gap: 20px; align-items: center; }
+.power-select-group select, .power-select-group input[type="date"] { padding: 8px 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 1em; width: 100%; }
+
+
+/* --- ÉTAPE 4 : SUIVI (ACCORDÉON) --- */
+.suivi-container { display: flex; flex-direction: column; gap: 10px; }
+.suivi-row { background: #fff; border: 1px solid #ddd; border-radius: 6px; overflow: hidden; }
+.suivi-header { padding: 12px 15px; background-color: #f8f9fa; display: flex; align-items: center; cursor: pointer; }
+.suivi-header.open { border-bottom: 1px solid #ddd; background-color: #e9ecef; }
+
+.suivi-header input[type="checkbox"] { transform: scale(1.3); margin-right: 15px; cursor: pointer; }
+.suivi-header label { font-weight: 600; font-size: 1.05em; cursor: pointer; flex-grow: 1; color: #333; }
+
+.suivi-content { padding: 15px; background-color: #fff; }
+.suivi-content input[type="text"], .suivi-content textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 1em; }
+.suivi-content textarea { resize: vertical; min-height: 80px; }
+.sub-label { display: block; margin-top: 10px; margin-bottom: 5px; font-weight: 500; color: #555; }
+
+
+/* --- ÉTAPE 5 : BILAN (GRILLE) --- */
+.instruction-text { text-align: center; font-size: 0.9em; color: #666; margin-bottom: 15px; background-color: #eef; padding: 10px; border-radius: 4px; }
+.bilan-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
+
+.bilan-item { 
+    display: flex; flex-direction: column; align-items: center; text-align: center; 
+    padding: 10px; border: 1px solid #eee; border-radius: 6px; background-color: #fff; 
+    transition: transform 0.2s; 
 }
+.bilan-item:hover { transform: translateY(-2px); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
 
-.next {
-    right: 20px;
+/* LE STYLE DES BOITES BILAN (IMPORTANT) */
+.bilan-box { 
+    width: 30px; height: 30px; 
+    border: 2px solid #555; border-radius: 4px; 
+    cursor: pointer; 
+    display: flex; align-items: center; justify-content: center; 
+    font-size: 20px; font-weight: bold; margin-bottom: 8px; user-select: none; 
+    background-color: white;
 }
+.bilan-box[data-status="checked"] { background-color: #e6ffed; border-color: #28a745; color: #28a745; }
+.bilan-box[data-status="crossed"] { background-color: #fff0f0; border-color: #dc3545; color: #dc3545; }
+.bilan-box[data-status="proposed"] { background-color: #e6f7ff; border-color: #007bff; color: #007bff; }
 
-.referenceField {
-    margin-top: 10px;
-    margin-bottom: 15px;
-    text-align: center;  /* Centrer le contenu de la référence */
+
+/* --- UTILITAIRES & SORTIE --- */
+.hidden { display: none !important; }
+
+#generate-button { 
+    background-color: #007bff; color: white; font-size: 1.1em; font-weight: bold; 
+    padding: 12px 20px; border: none; border-radius: 5px; cursor: pointer; 
+    width: 100%; margin-top: 30px; 
 }
+#generate-button:hover { background-color: #0056b3; }
 
-.referenceInput {
-    width: 200px;
-    padding: 5px;
-    margin-left: 10px;
-    text-align: center;  /* Centrer le texte à l'intérieur du champ */
+#trace-output-container { margin-top: 20px; }
+#trace-output-container label { display: block; font-weight: 600; margin-bottom: 5px; }
+#trace-output { 
+    width: 100%; height: 250px; font-family: "Courier New", Courier, monospace; font-size: 0.9em; 
+    border: 1px solid #ccc; border-radius: 4px; padding: 10px; box-sizing: border-box; background-color: #f9f9f9; 
 }
