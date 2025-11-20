@@ -1,333 +1,290 @@
 document.addEventListener("DOMContentLoaded", function() {
     
-    // --- 1. SÉLECTEURS GLOBAUX ---
+    // --- 1. SÉLECTEURS ---
     const buttons = document.querySelectorAll('.id-button');
     const motifButtons = document.querySelectorAll('.motif-button');
     
-    // Sections HTML
     const verifBlocks = document.querySelectorAll('.verif-block');
     const motifSection = document.getElementById('motif-appel-section');
     const separators = document.querySelectorAll('hr');
     const arborescenceSection = document.getElementById('arborescence-section');
-    const categoriesContainer = document.getElementById('categories-container');
+    const arborescenceContainer = document.getElementById('arborescence-container');
     const subcategoriesContainer = document.getElementById('subcategories-container');
     const actionArea = document.getElementById('action-area');
     const suiviDemandeSection = document.getElementById('suivi-demande-section');
     const bilanAppelSection = document.getElementById('bilan-appel-section');
     
-    // Style dynamique
     const dynamicStyle = document.getElementById('dynamic-module-style');
-
-    // Outputs
     const generateButton = document.getElementById('generate-button');
     const outputContainer = document.getElementById('trace-output-container');
     const outputTextarea = document.getElementById('trace-output');
     
-    // --- 2. VARIABLES GLOBALES ---
     window.traceAction = ""; 
     let selectedMotif = null;
-    let currentModuleCleanup = null; // Pour nettoyer le script du module précédent
+    let currentModuleCleanup = null;
 
-    // --- 3. DONNÉES ARBORESCENCE ---
-    const arborescence = {
-        puissance: { 
-            label: "Puissance", 
-            sub: { 
-                changement_puissance: { label: "Changement de puissance", file: "aide_changement_puissance.html" }, 
-                info_puissance: { label: "Information sur la puissance", file: "aide_info_puissance.html" } 
-            } 
+    // --- 2. ARBORESCENCE ---
+    const structureArborescence = [
+        {
+            title: "1 - GESTION DE CONTRAT",
+            categories: [
+                {
+                    label: "Souscription",
+                    subs: [
+                        { label: "Info souscription", file: "aide_generique.html" },
+                        { label: "Branchement provisoire", file: "aide_generique.html" },
+                        { label: "Inversion PDL/PCE", file: "aide_generique.html" }
+                    ]
+                },
+                {
+                    label: "Changement contractuel",
+                    subs: [
+                        { label: "Offre (Changement)", file: "aide_changement_offre.html" },
+                        { label: "Puissance (Changement)", file: "aide_changement_puissance.html" }
+                    ]
+                },
+                {
+                    label: "Facturation",
+                    subs: [
+                        { label: "Envoi de duplicata", file: "aide_envoi_duplicata.html" },
+                        { label: "Facture non reçue / multiple", file: "aide_generique.html" },
+                        { label: "Explication de facture", file: "aide_generique.html" },
+                        { label: "Estimation de régularisation", file: "aide_estimation_regularisation.html" },
+                        { label: "Contestation de facture", file: "aide_generique.html" }
+                    ]
+                },
+                {
+                    label: "Recouvrement",
+                    subs: [
+                        { label: "Délais / Impayés", file: "aide_generique.html" }
+                    ]
+                },
+                {
+                    label: "Résiliation",
+                    subs: [
+                        { label: "Contrat d'énergie", file: "aide_resiliation_energie.html" },
+                        { label: "Contrat de service", file: "aide_generique.html" }
+                    ]
+                }
+            ]
         },
-        facturation: { 
-            label: "Facturation", 
-            sub: { 
-                paiement: { label: "Paiement et échéancier", file: "aide_paiement.html" }, 
-                contestation: { label: "Contestation et Remboursement", file: "aide_contestation.html" } 
-            } 
-        },
-        contrat: { 
-            label: "Contrat", 
-            sub: { 
-                souscription_resiliation: { label: "Souscription / Résiliation", file: "aide_contrat.html" }, 
-                modification_offre: { label: "Modification d'offre", file: "aide_modification_offre.html" } 
-            } 
-        },
-        intervention: { 
-            label: "Intervention", 
-            sub: { 
-                releve: { label: "Relève et Compteur", file: "aide_releve.html" }, 
-                depannage: { label: "Dépannage / Urgence", file: "aide_depannage.html" } 
-            } 
+        {
+            title: "2 - DEMANDE TECHNIQUE",
+            categories: [
+                {
+                    label: "RDV",
+                    subs: [
+                        { label: "Modification de RDV", file: "aide_generique.html" },
+                        { label: "Réclamation RDV", file: "aide_generique.html" }
+                    ]
+                },
+                {
+                    label: "Panne / Urgence",
+                    subs: [
+                        { label: "Panne de courant / Gaz", file: "aide_panne_courant.html" },
+                        { label: "Problème matériel", file: "aide_generique.html" },
+                        { label: "Demande d'intervention", file: "aide_generique.html" }
+                    ]
+                },
+                {
+                    label: "Relevés",
+                    subs: [
+                        { label: "Transmission de relevés", file: "aide_transmission_releves.html" }
+                    ]
+                }
+            ]
         }
-    };
+    ];
 
-    // --- 4. FONCTION DE CHARGEMENT MODULAIRE (Cœur du système) ---
+    // --- 3. FONCTIONS INTERFACE ---
+    function renderArborescence() {
+        if (!arborescenceContainer) return;
+        arborescenceContainer.innerHTML = ''; 
+        structureArborescence.forEach((partie, pIndex) => {
+            const partTitle = document.createElement('h3');
+            partTitle.className = 'part-title'; partTitle.textContent = partie.title;
+            arborescenceContainer.appendChild(partTitle);
+            const btnGroup = document.createElement('div');
+            btnGroup.className = 'button-group';
+            partie.categories.forEach((cat, cIndex) => {
+                const btn = document.createElement('button');
+                btn.type = 'button'; btn.className = 'category-button'; btn.textContent = cat.label;
+                btn.dataset.pIndex = pIndex; btn.dataset.cIndex = cIndex;
+                btnGroup.appendChild(btn);
+            });
+            arborescenceContainer.appendChild(btnGroup);
+        });
+    }
+
     async function loadExternalModule(filename) {
-        // A. Nettoyage
-        if (currentModuleCleanup) {
-            currentModuleCleanup(); // Appel de la fonction de nettoyage du module précédent
-            currentModuleCleanup = null;
-        }
-        dynamicStyle.innerHTML = ""; // Supprimer le CSS précédent
-        actionArea.innerHTML = '<p style="color:#666;">Chargement du module...</p>';
+        if (currentModuleCleanup) { currentModuleCleanup(); currentModuleCleanup = null; }
+        if (dynamicStyle) dynamicStyle.innerHTML = "";
+        actionArea.innerHTML = '<p style="color:#666;">Chargement...</p>';
         actionArea.classList.remove('hidden');
         window.traceAction = ""; 
 
         try {
             const response = await fetch(filename);
-            if (!response.ok) throw new Error("Fichier introuvable");
-            
+            if (!response.ok) throw new Error("Fichier non trouvé");
             const htmlContent = await response.text();
-            
-            // B. Parsing
             const parser = new DOMParser();
             const doc = parser.parseFromString(htmlContent, 'text/html');
 
-            // C. Injection CSS
             const styles = doc.querySelectorAll('style');
-            styles.forEach(style => dynamicStyle.innerHTML += style.innerHTML);
+            if (dynamicStyle) styles.forEach(style => dynamicStyle.innerHTML += style.innerHTML);
 
-            // D. Injection HTML (Wrapper)
             const wrapper = doc.querySelector('.module-wrapper') || doc.body;
-            // On retire les scripts du HTML parsé pour les exécuter manuellement après
-            wrapper.querySelectorAll('script').forEach(s => s.remove());
-            wrapper.querySelectorAll('style').forEach(s => s.remove());
-            
+            wrapper.querySelectorAll('script, style').forEach(el => el.remove());
             actionArea.innerHTML = wrapper.innerHTML;
 
-            // E. Exécution JS
             const scripts = doc.querySelectorAll('script');
             scripts.forEach(script => {
                 const newScript = document.createElement("script");
                 newScript.textContent = script.textContent;
-                document.body.appendChild(newScript); // Exécute le script
-                document.body.removeChild(newScript); // Nettoie la balise
+                document.body.appendChild(newScript);
+                document.body.removeChild(newScript);
             });
-
         } catch (error) {
-            actionArea.innerHTML = `
-                <h3>${filename}</h3>
-                <p>Simulation : Le fichier n'existe pas sur le serveur.</p>
-            `;
-            window.traceAction = `Le client a abordé le sujet : ${filename.replace('.html', '')}`;
+            actionArea.innerHTML = `<h3>${filename}</h3><p><i>Module standard (Fichier non créé).</i></p>`;
+            window.traceAction = `Sujet abordé : ${filename.replace('.html', '').replace('aide_', '')}`;
         }
     }
 
-    // --- 5. LOGIQUE ÉVÉNEMENTIELLE (Boutons et Interactions) ---
+    // --- 4. LISTENERS ---
 
-    // A. Gestion des Boites (Verif RGPD)
-    document.querySelectorAll('.verif-box').forEach(box => {
-        box.addEventListener('click', function() {
-            const status = this.dataset.status;
-            this.dataset.status = (status === 'checked') ? 'none' : 'checked';
-            this.innerHTML = (this.dataset.status === 'checked') ? '✔' : '';
-            outputContainer.classList.add('hidden');
-        });
-        box.addEventListener('dblclick', function(e) {
-            e.preventDefault();
-            const status = this.dataset.status;
-            this.dataset.status = (status === 'crossed') ? 'none' : 'crossed';
-            this.innerHTML = (this.dataset.status === 'crossed') ? '✖' : '';
-            outputContainer.classList.add('hidden');
-        });
-    });
-
-    // B. Boutons Identification (Étape 1)
+    // RGPD
     buttons.forEach(button => {
         button.addEventListener('click', function() {
             const targetId = this.dataset.target;
-            
-            // Gestion classe active
             buttons.forEach(btn => btn.classList.remove('active'));
             this.classList.add('active');
-            
-            // Affichage bloc vérification
             verifBlocks.forEach(block => {
-                if (block.id === targetId) {
-                    block.classList.remove('hidden');
-                } else {
-                    block.classList.add('hidden');
-                    // Reset des cases des autres blocs
-                    block.querySelectorAll('.verif-box').forEach(box => { 
-                        box.dataset.status = 'none'; 
-                        box.innerHTML = ''; 
-                    });
-                }
+                if (block.id === targetId) { block.classList.remove('hidden'); } 
+                else { block.classList.add('hidden'); block.querySelectorAll('.verif-box').forEach(b => { b.dataset.status='none'; b.innerHTML=''; }); }
             });
-            
-            // Afficher TOUTES les étapes suivantes
-            motifSection.classList.remove('hidden');
+            if(motifSection) motifSection.classList.remove('hidden');
             separators.forEach(sep => sep.classList.remove('hidden'));
-            arborescenceSection.classList.remove('hidden'); 
-            suiviDemandeSection.classList.remove('hidden');
-            bilanAppelSection.classList.remove('hidden');
-            
+            if(arborescenceSection) { arborescenceSection.classList.remove('hidden'); renderArborescence(); }
+            if(suiviDemandeSection) suiviDemandeSection.classList.remove('hidden');
+            if(bilanAppelSection) bilanAppelSection.classList.remove('hidden');
             outputContainer.classList.add('hidden');
         });
     });
 
-    // C. Boutons Motif (Étape 2)
+    // ARBORESCENCE
+    if (arborescenceContainer) {
+        arborescenceContainer.addEventListener('click', function(e) {
+            if (e.target.classList.contains('category-button')) {
+                document.querySelectorAll('.category-button').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                const pIndex = e.target.dataset.pIndex;
+                const cIndex = e.target.dataset.cIndex;
+                const subs = structureArborescence[pIndex].categories[cIndex].subs;
+                subcategoriesContainer.innerHTML = '';
+                subcategoriesContainer.classList.remove('hidden');
+                actionArea.classList.add('hidden');
+                subs.forEach(sub => {
+                    const btn = document.createElement('button');
+                    btn.className = 'subcategory-button';
+                    btn.textContent = sub.label; btn.dataset.file = sub.file;
+                    subcategoriesContainer.appendChild(btn);
+                });
+            }
+        });
+    }
+
+    if (subcategoriesContainer) {
+        subcategoriesContainer.addEventListener('click', function(e) {
+            if (e.target.classList.contains('subcategory-button')) {
+                document.querySelectorAll('.subcategory-button').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                loadExternalModule(e.target.dataset.file);
+            }
+        });
+    }
+
+    // MOTIFS
     motifButtons.forEach(button => {
         button.addEventListener('click', function() {
             motifButtons.forEach(btn => btn.classList.remove('active'));
             this.classList.add('active');
             selectedMotif = this.dataset.motif;
-            outputContainer.classList.add('hidden');
         });
     });
 
-    // D. Arborescence (Étape 3)
-    categoriesContainer.addEventListener('click', function(e) {
-        if (e.target.classList.contains('category-button')) {
-            // Gestion boutons catégories
-            categoriesContainer.querySelectorAll('.category-button').forEach(btn => btn.classList.remove('active'));
-            e.target.classList.add('active');
-            
-            const catKey = e.target.dataset.category;
-            const subs = arborescence[catKey].sub;
-            
-            // Remplir sous-catégories
-            subcategoriesContainer.innerHTML = '';
-            subcategoriesContainer.classList.remove('hidden');
-            actionArea.classList.add('hidden');
-            
-            for (const key in subs) {
-                const btn = document.createElement('button');
-                btn.className = 'category-button';
-                btn.dataset.file = subs[key].file;
-                btn.textContent = subs[key].label;
-                subcategoriesContainer.appendChild(btn);
-            }
-            outputContainer.classList.add('hidden');
-        }
-    });
-
-    subcategoriesContainer.addEventListener('click', function(e) {
-        if (e.target.classList.contains('category-button')) {
-            subcategoriesContainer.querySelectorAll('.category-button').forEach(btn => btn.classList.remove('active'));
-            e.target.classList.add('active');
-            // CHARGER LE MODULE EXTERNE
-            loadExternalModule(e.target.dataset.file);
-            outputContainer.classList.add('hidden');
-        }
-    });
-
-    // E. Suivi de la demande (Étape 4)
-    // Calcul date automatique
-    function calculateRecontactDate() {
-        const today = new Date();
-        let futureDate = new Date();
-        futureDate.setDate(today.getDate() + 15);
-        if (futureDate.getDay() === 0) futureDate.setDate(futureDate.getDate() + 1);
-        return futureDate.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-    }
-
+    // SUIVI
     document.querySelectorAll('.suivi-header input[type="checkbox"]').forEach(checkbox => {
         checkbox.addEventListener('change', function() {
             const contentId = this.dataset.target;
             const contentDiv = document.getElementById(contentId);
             const headerDiv = this.closest('.suivi-header');
-            
-            if (this.checked) {
-                contentDiv.classList.remove('hidden');
-                headerDiv.classList.add('open');
-                if (this.id === 'check-otd') document.getElementById('otd-date').value = calculateRecontactDate();
-            } else {
-                contentDiv.classList.add('hidden');
-                headerDiv.classList.remove('open');
-                contentDiv.querySelectorAll('input, textarea').forEach(i => i.value = '');
-            }
-            outputContainer.classList.add('hidden');
+            if (this.checked) { contentDiv.classList.remove('hidden'); headerDiv.classList.add('open'); } 
+            else { contentDiv.classList.add('hidden'); headerDiv.classList.remove('open'); contentDiv.querySelectorAll('input, textarea').forEach(i => i.value = ''); }
         });
     });
 
-    // F. Bilan (Étape 5) - Gestion Clic Droit/Gauche/Double
-    document.querySelectorAll('.bilan-box').forEach(box => {
-        box.addEventListener('click', function() {
-            const status = this.dataset.status;
+    // CLICS CASES
+    const handleBoxClick = function(e) {
+        const status = this.dataset.status;
+        if (e.type === 'click') {
             this.dataset.status = (status === 'checked') ? 'none' : 'checked';
             this.innerHTML = (this.dataset.status === 'checked') ? '✔' : '';
-        });
-        box.addEventListener('dblclick', function(e) {
+        } else if (e.type === 'dblclick') {
             e.preventDefault();
             this.dataset.status = 'crossed';
             this.innerHTML = '✖';
-        });
-        box.addEventListener('contextmenu', function(e) {
+        } else if (e.type === 'contextmenu' && this.classList.contains('bilan-box')) {
             e.preventDefault();
-            const status = this.dataset.status;
             this.dataset.status = (status === 'proposed') ? 'none' : 'proposed';
             this.innerHTML = (this.dataset.status === 'proposed') ? 'ℹ' : '';
-        });
+        }
+    };
+    document.querySelectorAll('.verif-box, .bilan-box').forEach(box => {
+        box.addEventListener('click', handleBoxClick);
+        box.addEventListener('dblclick', handleBoxClick);
+        box.addEventListener('contextmenu', handleBoxClick);
     });
 
-    // --- 6. GÉNÉRATION DU TRAÇAGE FINAL ---
+    // --- 5. GÉNÉRATION ---
     generateButton.addEventListener('click', function() {
-        
-        // Vérifications
         const activeIdBtn = document.querySelector('.id-button.active');
-        if (!activeIdBtn) { alert("Veuillez sélectionner un mode d'identification (Étape 1)."); return; }
-        if (!selectedMotif) { alert("Veuillez sélectionner un motif (Étape 2)."); return; }
+        if (!activeIdBtn) return alert("Erreur : Étape 1 (Identification) manquante.");
+        if (!selectedMotif) return alert("Erreur : Étape 2 (Motif) manquante.");
 
-        // 1. RGPD
         const shortMode = activeIdBtn.dataset.shortMode;
         const activeBlock = document.getElementById(activeIdBtn.dataset.target);
         const boxes = activeBlock.querySelectorAll('.verif-box');
         let red = [], greenCount = 0;
-        boxes.forEach(b => {
-            if(b.dataset.status === 'crossed') red.push(b.nextElementSibling.textContent.trim());
-            if(b.dataset.status === 'checked') greenCount++;
-        });
-
+        boxes.forEach(b => { if (b.dataset.status === 'crossed') red.push(b.nextElementSibling.textContent); if (b.dataset.status === 'checked') greenCount++; });
         let trace = `Client ${shortMode === 'non identifié' ? shortMode : 'identifié par ' + shortMode}`;
-        if (red.length > 0) trace += ` et RGPD échouée sur :\n` + red.map(r => ` - ${r}`).join('\n');
-        else if (greenCount === boxes.length) trace += ` et RGPD OK\n`;
-        else trace += ` - Vérification RGPD incomplète.\n`;
+        trace += red.length > 0 ? ` et RGPD échouée sur :\n` + red.map(r => ` - ${r}`).join('\n') : (greenCount === boxes.length ? ` et RGPD OK\n` : ` - Vérification RGPD incomplète.\n`);
 
-        // 2. Motif & Date
         const now = new Date();
-        const dateStr = now.toLocaleDateString('fr-FR');
-        const timeStr = now.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
-        trace += `\n${selectedMotif.charAt(0).toUpperCase() + selectedMotif.slice(1)} adressée le ${dateStr} à ${timeStr}.\n`;
+        trace += `\n${selectedMotif.toUpperCase()} adressée le ${now.toLocaleDateString()} à ${now.toLocaleTimeString()}.\n`;
+        trace += window.traceAction ? `\n${window.traceAction}\n` : `\n⚠ Aucune action spécifique enregistrée.\n`;
 
-        // 3. Action (Variable globale remplie par le module)
-        trace += window.traceAction ? `\n${window.traceAction}\n` : `\n⚠ Aucune action spécifique sélectionnée.\n`;
-
-        // 4. Suivi
         let traceSuivi = "";
         document.querySelectorAll('.suivi-header input[type="checkbox"]:checked').forEach(cb => {
-            if (cb.id !== 'check-otd') {
-                const val = document.getElementById(cb.dataset.target).querySelector('input').value;
-                if (val) traceSuivi += `- ${cb.nextElementSibling.textContent.trim()}: ${val}\n`;
-            }
+            if (cb.id !== 'check-otd') { const val = document.getElementById(cb.dataset.target).querySelector('input').value; if (val) traceSuivi += `- ${cb.nextElementSibling.textContent.trim()}: ${val}\n`; }
         });
-        if (document.getElementById('check-otd').checked) {
-            traceSuivi += `- OTD: Superviseur (${document.getElementById('otd-superviseur').value}), Détails (${document.getElementById('otd-details').value}), Recontact (${document.getElementById('otd-date').value})\n`;
-        }
+        if (document.getElementById('check-otd').checked) { traceSuivi += `- OTD: Superviseur(${document.getElementById('otd-superviseur').value}) Détails(${document.getElementById('otd-details').value})\n`; }
         if (traceSuivi) trace += `\n--- SUIVI ---\n${traceSuivi}`;
 
-        // 5. Bilan
-        let souscrits = [], relations = [], refuses = [], proposes = [];
-        document.querySelectorAll('.bilan-box').forEach(box => {
-            const label = box.dataset.label;
-            const type = box.dataset.type;
-            const status = box.dataset.status;
-
-            if (status === 'checked') {
-                if (type === 'sub') souscrits.push(label);
-                else relations.push(label);
-            } else if (status === 'crossed') refuses.push(label);
-            else if (status === 'proposed') proposes.push(label);
+        let sous=[], rel=[], ref=[], prop=[];
+        document.querySelectorAll('.bilan-box').forEach(b => {
+            const l=b.dataset.label, s=b.dataset.status, t=b.dataset.type;
+            if(s==='checked') t==='sub'?sous.push(l):rel.push(l);
+            else if(s==='crossed') ref.push(l);
+            else if(s==='proposed') prop.push(l);
         });
-
-        if (souscrits.length > 0 || relations.length > 0 || refuses.length > 0 || proposes.length > 0) {
-            trace += `\n--- BILAN DE L'APPEL ---\n`;
-            if (souscrits.length > 0) trace += `Le client a souscrit à : ${souscrits.join(', ')}\n`;
-            if (relations.length > 0) trace += `Le client a demandé à être mis en relation avec : ${relations.join(', ')}\n`;
-            if (refuses.length > 0) trace += `Le client a refusé : ${refuses.join(', ')}\n`;
-            if (proposes.length > 0) trace += `Proposition faite pour : ${proposes.join(', ')}\n`;
+        if (sous.length+rel.length+ref.length+prop.length > 0) {
+            trace += `\n--- BILAN ---\n`;
+            if(sous.length) trace+=`Souscrit: ${sous.join(', ')}\n`;
+            if(rel.length) trace+=`Mise en relation: ${rel.join(', ')}\n`;
+            if(ref.length) trace+=`Refusé: ${ref.join(', ')}\n`;
+            if(prop.length) trace+=`Proposé: ${prop.join(', ')}\n`;
         }
 
-        // Affichage final
         outputTextarea.value = trace;
         outputContainer.classList.remove('hidden');
     });

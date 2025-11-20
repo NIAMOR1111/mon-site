@@ -1,0 +1,126 @@
+<div class="module-wrapper">
+    <h3 class="module-title">📄 Envoi de Duplicata</h3>
+
+    <div class="rgpd-alert">
+        ⚠️ <strong>Rappel :</strong> Identification RGPD complète requise.
+    </div>
+
+    <div class="split-container">
+        <div class="column-left">
+            <div class="form-group">
+                <label>Type de document :</label>
+                <select id="dup-doc-type" class="input-force">
+                    <option value="Facture">Facture</option>
+                    <option value="Echeancier">Échéancier</option>
+                    <option value="Plan d'apurement">Plan d'apurement</option>
+                    <option value="Proposition Commerciale">Proposition commerciale</option>
+                    <option value="Autre">Autre</option>
+                </select>
+                <input type="text" id="dup-doc-other" class="input-force hidden" placeholder="Précisez..." style="margin-top:5px;">
+            </div>
+
+            <div class="form-group">
+                <label>Date d'édition :</label>
+                <input type="date" id="dup-doc-date" class="input-force">
+            </div>
+
+            <div class="form-group">
+                <label>Mode d'envoi :</label>
+                <div class="radio-group">
+                    <label><input type="radio" name="dup-send-mode" value="Email" checked> Email</label>
+                    <label><input type="radio" name="dup-send-mode" value="Papier"> Papier</label>
+                </div>
+            </div>
+
+            <button type="button" id="dup-add-btn" class="action-button">Enregistrer le document</button>
+        </div>
+
+        <div class="column-right">
+            <h4>Documents enregistrés :</h4>
+            <div id="dup-list-container" class="list-container">
+                <p class="empty-msg">Aucun document.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .module-wrapper * { box-sizing: border-box; }
+
+    /* STYLE STRICT IDENTIQUE PARTOUT */
+    .input-force { 
+        width: 100% !important; 
+        height: 40px !important; 
+        padding: 6px 10px !important; 
+        border: 1px solid #ccc !important; 
+        border-radius: 4px !important; 
+        box-sizing: border-box !important;
+        display: block !important;
+        margin: 0 !important;
+        font-family: inherit;
+        font-size: 1em;
+    }
+
+    .split-container { display: flex; gap: 20px; align-items: flex-start; }
+    .column-left, .column-right { flex: 1; width: 50%; }
+
+    .form-group { margin-bottom: 15px; width: 100%; }
+    .form-group label { display: block; margin-bottom: 5px; font-weight: 600; color: #333; }
+    
+    .rgpd-alert { background-color: #ffe6e6; color: #a71d2a; border: 1px solid #f5c6cb; padding: 10px; border-radius: 4px; text-align: center; margin-bottom: 20px; }
+    .radio-group { display: flex; gap: 15px; padding-top: 5px; }
+    .radio-group label { font-weight: normal; cursor: pointer; }
+
+    .action-button { background-color: #007bff; color: white; border: none; padding: 10px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; transition: 0.2s; }
+    .action-button:hover { background-color: #0056b3; }
+
+    .column-right { background-color: #f8f9fa; padding: 15px; border-radius: 6px; border: 1px solid #ddd; min-height: 250px; }
+    .column-right h4 { margin: 0 0 10px 0; border-bottom: 1px solid #ccc; padding-bottom: 5px; }
+    .list-container { max-height: 300px; overflow-y: auto; }
+    .empty-msg { color: #777; font-style: italic; font-size: 0.9em; text-align: center; margin-top: 20px; }
+
+    .doc-entry { background: white; border: 1px solid #ddd; padding: 8px; margin-bottom: 8px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; font-size: 0.9em; }
+    .delete-btn { background-color: #dc3545; color: white; border: none; padding: 2px 8px; border-radius: 3px; cursor: pointer; font-size: 0.8em; margin-left: 5px; }
+</style>
+
+<script>
+(function(){
+    const typeSel = document.getElementById('dup-doc-type');
+    const otherInput = document.getElementById('dup-doc-other');
+    const dateInput = document.getElementById('dup-doc-date');
+    const addBtn = document.getElementById('dup-add-btn');
+    const listContainer = document.getElementById('dup-list-container');
+    let documents = [];
+
+    typeSel.addEventListener('change', function() {
+        this.value === 'Autre' ? otherInput.classList.remove('hidden') : otherInput.classList.add('hidden');
+    });
+
+    addBtn.addEventListener('click', function() {
+        let type = typeSel.value === 'Autre' ? otherInput.value.trim() : typeSel.value;
+        const dateVal = dateInput.value;
+        if(!type || !dateVal) return alert("Veuillez remplir les champs.");
+
+        const mode = document.querySelector('input[name="dup-send-mode"]:checked').value;
+        const dateFr = new Date(dateVal).toLocaleDateString('fr-FR');
+
+        documents.push({ id: Date.now(), text: `${type} du ${dateFr} (${mode})` });
+        renderList();
+        if(typeSel.value === 'Autre') otherInput.value = "";
+    });
+
+    function renderList() {
+        listContainer.innerHTML = documents.length ? "" : '<p class="empty-msg">Aucun document.</p>';
+        documents.forEach(doc => {
+            const div = document.createElement('div'); div.className = 'doc-entry';
+            div.innerHTML = `<span>${doc.text}</span>`;
+            const btn = document.createElement('button'); btn.className = 'delete-btn'; btn.textContent = "X";
+            btn.onclick = () => { documents = documents.filter(d => d.id !== doc.id); renderList(); };
+            div.appendChild(btn);
+            listContainer.appendChild(div);
+        });
+        window.traceAction = documents.length ? `Envoi de duplicata : ${documents.map(d => d.text).join(', ')}.` : "";
+    }
+    window.currentModuleCleanup = function() { window.traceAction = ""; };
+})();
+</script>

@@ -1,0 +1,145 @@
+<div class="module-wrapper">
+    <h3 class="module-title">🚪 Résiliation de Contrat</h3>
+
+    <div class="form-group" style="background:#e9ecef; padding:15px; border-radius:4px; border:1px solid #adb5bd;">
+        <label>Contrats concernés :</label>
+        <select id="resil-scope" class="input-force bold-select">
+            <option value="">-- Choisir --</option>
+            <option value="ELEC">Électricité uniquement</option>
+            <option value="GAZ">Gaz uniquement</option>
+            <option value="BI">Bi-énergie (Élec + Gaz)</option>
+        </select>
+    </div>
+
+    <div class="resil-grid">
+        <div id="resil-block-elec" class="energy-block hidden">
+            <h4 class="elec-title">⚡ Électricité</h4>
+            <div class="form-group">
+                <label>Date de résiliation :</label>
+                <input type="date" id="elec-date" class="input-force">
+            </div>
+            <div class="form-group options-group">
+                <label>Motif / Méthode :</label>
+                <div class="radio-item"><input type="radio" name="elec-type" value="rdv" id="elec-rdv"><label for="elec-rdv">Avec RDV distributeur</label></div>
+                <div id="elec-msg-index" class="alert-msg hidden">⚠️ Pensez à enregistrer un relevé d'index !</div>
+                <div class="radio-item"><input type="radio" name="elec-type" value="tele" id="elec-tele"><label for="elec-tele">Par téléopération (Linky)</label></div>
+                <div class="radio-item"><input type="radio" name="elec-type" value="autre" id="elec-autre"><label for="elec-autre">Autre / Spécifique</label></div>
+                <input type="text" id="elec-comment" class="input-force hidden" placeholder="Précisez..." style="margin-top:5px;">
+            </div>
+        </div>
+
+        <div id="resil-block-gas" class="energy-block hidden">
+            <h4 class="gas-title">🔥 Gaz</h4>
+            <div class="form-group">
+                <label>Date de résiliation :</label>
+                <input type="date" id="gas-date" class="input-force">
+            </div>
+            <div class="form-group options-group">
+                <label>Motif / Méthode :</label>
+                <div class="radio-item"><input type="radio" name="gas-type" value="rdv" id="gas-rdv"><label for="gas-rdv">Avec RDV distributeur</label></div>
+                <div id="gas-msg-index" class="alert-msg hidden">⚠️ Pensez à enregistrer un relevé d'index !</div>
+                <div class="radio-item"><input type="radio" name="gas-type" value="tele" id="gas-tele"><label for="gas-tele">Par téléopération (Gazpar)</label></div>
+                <div class="radio-item"><input type="radio" name="gas-type" value="autre" id="gas-autre"><label for="gas-autre">Autre / Spécifique</label></div>
+                <input type="text" id="gas-comment" class="input-force hidden" placeholder="Précisez..." style="margin-top:5px;">
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .module-wrapper * { box-sizing: border-box; }
+    
+    /* STYLE FORCE POUR ALIGNEMENT */
+    .input-force { 
+        width: 100% !important; 
+        height: 40px !important; 
+        padding: 6px 10px !important; 
+        border: 1px solid #ccc !important; 
+        border-radius: 4px !important; 
+        box-sizing: border-box !important;
+        display: block !important;
+        margin: 0 !important;
+        font-family: inherit;
+    }
+    .bold-select { font-weight: bold; }
+
+    .resil-grid { display: flex; gap: 20px; flex-wrap: wrap; }
+    .energy-block { flex: 1; min-width: 300px; background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 15px; }
+
+    .elec-title { margin-top: 0; color: #0047a0; border-bottom: 2px solid #0047a0; padding-bottom: 5px; }
+    .gas-title { margin-top: 0; color: #e67e22; border-bottom: 2px solid #e67e22; padding-bottom: 5px; }
+
+    .options-group { display: flex; flex-direction: column; gap: 8px; }
+    .radio-item { display: flex; align-items: center; gap: 8px; }
+    .radio-item input { transform: scale(1.2); cursor: pointer; }
+    .radio-item label { font-weight: normal; cursor: pointer; margin: 0; }
+
+    .alert-msg { color: #dc3545; font-size: 0.9em; font-weight: bold; margin-left: 25px; background: #fff0f0; padding: 5px; border-radius: 4px; }
+</style>
+
+<script>
+(function(){
+    const scopeSel = document.getElementById('resil-scope');
+    const blockElec = document.getElementById('resil-block-elec');
+    const blockGas = document.getElementById('resil-block-gas');
+
+    const elecDate = document.getElementById('elec-date');
+    const elecRadios = document.getElementsByName('elec-type');
+    const elecMsg = document.getElementById('elec-msg-index');
+    const elecComment = document.getElementById('elec-comment');
+
+    const gasDate = document.getElementById('gas-date');
+    const gasRadios = document.getElementsByName('gas-type');
+    const gasMsg = document.getElementById('gas-msg-index');
+    const gasComment = document.getElementById('gas-comment');
+
+    scopeSel.addEventListener('change', function() {
+        const val = this.value;
+        blockElec.classList.add('hidden'); blockGas.classList.add('hidden');
+        if (val === 'ELEC' || val === 'BI') blockElec.classList.remove('hidden');
+        if (val === 'GAZ' || val === 'BI') blockGas.classList.remove('hidden');
+        updateTrace();
+    });
+
+    function handleUI(radios, msgDiv, commentInput) {
+        radios.forEach(r => {
+            r.addEventListener('change', () => {
+                msgDiv.classList.toggle('hidden', r.value !== 'rdv');
+                commentInput.classList.toggle('hidden', r.value !== 'autre');
+                updateTrace();
+            });
+        });
+    }
+
+    handleUI(elecRadios, elecMsg, elecComment);
+    handleUI(gasRadios, gasMsg, gasComment);
+    [elecDate, gasDate, elecComment, gasComment].forEach(el => el.addEventListener('input', updateTrace));
+
+    function getTraceFor(energyName, dateVal, radios, commentInput) {
+        const dateStr = dateVal ? new Date(dateVal).toLocaleDateString('fr-FR') : "Date non définie";
+        let type = "";
+        radios.forEach(r => { if(r.checked) type = r.value; });
+        if (!type) return "";
+        if (type === 'rdv') return `RDV programmé résiliation ${energyName} (${dateStr}).`;
+        if (type === 'tele') return `Résiliation ${energyName} par téléopération (${dateStr}).`;
+        if (type === 'autre') return `Résiliation ${energyName} (${dateStr}) : ${commentInput.value.trim() || 'Motif non précisé'}.`;
+        return "";
+    }
+
+    function updateTrace() {
+        const scope = scopeSel.value;
+        let traces = [];
+        if ((scope === 'ELEC' || scope === 'BI') && !blockElec.classList.contains('hidden')) {
+            const t = getTraceFor("Élec", elecDate.value, elecRadios, elecComment);
+            if(t) traces.push(t);
+        }
+        if ((scope === 'GAZ' || scope === 'BI') && !blockGas.classList.contains('hidden')) {
+            const t = getTraceFor("Gaz", gasDate.value, gasRadios, gasComment);
+            if(t) traces.push(t);
+        }
+        window.traceAction = traces.join(" ");
+    }
+
+    window.currentModuleCleanup = function() { window.traceAction = ""; };
+})();
+</script>

@@ -1,0 +1,144 @@
+<div class="module-wrapper">
+    <h3 class="module-title">🔢 Transmission de Relevés</h3>
+
+    <div class="form-group" style="background:#eef; padding:15px; border-radius:4px; border:1px solid #ccd;">
+        <label>Ajouter un index :</label>
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <select id="rel-select" class="input-style" style="flex: 2;">
+                <option value="Base">Base</option>
+                <option value="HC">Heures Creuses</option>
+                <option value="HP">Heures Pleines</option>
+                <option value="HC Semaine">HC Semaine</option>
+                <option value="HP Semaine">HP Semaine</option>
+                <option value="HC Week-end">HC Week-end</option>
+                <option value="HP Week-end">HP Week-end</option>
+                <option value="HC Bleu">HC Jours Bleus</option>
+                <option value="HP Bleu">HP Jours Bleus</option>
+                <option value="HC Blanc">HC Jours Blancs</option>
+                <option value="HP Blanc">HP Jours Blancs</option>
+                <option value="HC Rouge">HC Jours Rouges</option>
+                <option value="HP Rouge">HP Jours Rouges</option>
+                <option value="Gaz">Gaz (m3)</option>
+            </select>
+            <button id="rel-add-btn" class="action-button" style="flex: 1;">Ajouter +</button>
+        </div>
+    </div>
+
+    <div id="rel-container" style="margin-top: 20px;"></div>
+
+</div>
+
+<style>
+    .module-wrapper * { box-sizing: border-box; }
+    .input-style { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; height: 38px; }
+    
+    .action-button { 
+        background-color: #28a745; color: white; border: none; 
+        padding: 0 15px; height: 38px; border-radius: 4px; 
+        cursor: pointer; font-weight: bold; transition: 0.2s; 
+    }
+    .action-button:hover { background-color: #218838; }
+
+    /* Style des lignes d'index ajoutées */
+    .index-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: #fff;
+        border: 1px solid #ddd;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 4px;
+        animation: fadeIn 0.3s ease;
+    }
+    
+    .index-label {
+        font-weight: bold;
+        color: #0047a0;
+        width: 150px; /* Largeur fixe pour alignement */
+    }
+    
+    .index-input {
+        flex: 1;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        text-align: right;
+        font-family: monospace;
+        font-size: 1.1em;
+    }
+
+    .delete-btn {
+        background-color: #dc3545; color: white; border: none;
+        width: 30px; height: 30px; border-radius: 4px;
+        cursor: pointer; font-weight: bold;
+    }
+    .delete-btn:hover { background-color: #c82333; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+
+<script>
+(function(){
+    const addBtn = document.getElementById('rel-add-btn');
+    const select = document.getElementById('rel-select');
+    const container = document.getElementById('rel-container');
+
+    // Fonction pour mettre à jour le traçage
+    function updateTrace() {
+        const inputs = container.querySelectorAll('.index-input');
+        let traces = [];
+        
+        inputs.forEach(inp => {
+            const type = inp.dataset.type;
+            const val = inp.value.trim();
+            if(val) {
+                traces.push(`${type} (${val})`);
+            }
+        });
+
+        if (traces.length > 0) {
+            window.traceAction = `Transmission de relevés : ${traces.join(', ')}.`;
+        } else {
+            window.traceAction = "";
+        }
+    }
+
+    addBtn.addEventListener('click', function() {
+        const type = select.value;
+        
+        // Vérifier doublon
+        if (document.getElementById(`row-${type}`)) {
+            alert("Ce cadran est déjà affiché.");
+            return;
+        }
+
+        const div = document.createElement('div');
+        div.className = 'index-row';
+        div.id = `row-${type}`;
+
+        // HTML de la ligne
+        div.innerHTML = `
+            <span class="index-label">${type} :</span>
+            <input type="number" class="index-input" data-type="${type}" placeholder="Index ici">
+            <button class="delete-btn" title="Supprimer">✕</button>
+        `;
+
+        // Suppression
+        div.querySelector('.delete-btn').addEventListener('click', function() {
+            div.remove();
+            updateTrace();
+        });
+
+        // Traçage à la saisie
+        div.querySelector('.index-input').addEventListener('input', updateTrace);
+
+        container.appendChild(div);
+        
+        // Focus automatique sur le nouveau champ
+        div.querySelector('input').focus();
+    });
+
+    window.currentModuleCleanup = function() { window.traceAction = ""; };
+})();
+</script>

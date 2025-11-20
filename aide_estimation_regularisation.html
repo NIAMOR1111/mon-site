@@ -1,0 +1,243 @@
+<div class="module-wrapper">
+    <h3 class="module-title">📊 Estimation de Régularisation</h3>
+
+    <div class="config-box">
+        <label style="font-weight:bold; margin-bottom:10px; display:block;">1. Configuration de la simulation :</label>
+        
+        <div class="config-grid-simple">
+            <div class="config-item">
+                <label class="small-label">Type d'énergie :</label>
+                <select id="global-energy-type" class="input-style bold-select">
+                    <option value="">-- Choisir --</option>
+                    <option value="ELEC">Électricité</option>
+                    <option value="GAZ">Gaz</option>
+                    <option value="BI">Bi-énergie</option>
+                </select>
+            </div>
+            <div class="config-item">
+                <label class="small-label">Mois de fin (Régul) :</label>
+                <input type="month" id="global-date" class="input-style">
+            </div>
+        </div>
+    </div>
+
+    <div id="block-elec" class="energy-block hidden">
+        <h4 class="energy-title elec-title">⚡ Électricité</h4>
+        <div class="form-group"><label>Univers :</label><select id="elec-universe" class="input-style"><option value="">-- Choisir --</option><option value="TRV">TRV (Tarif Bleu)</option><option value="OM">OM</option></select></div>
+        <div id="elec-offer-container" class="form-group hidden"><label>Offre :</label><select id="elec-offer-type" class="input-style"></select></div>
+        <div id="elec-option-container" class="form-group hidden"><label>Option :</label><select id="elec-option-select" class="input-style"></select></div>
+        <div class="form-group grid-2">
+            <div><label>Abo. Annuel (€) :</label><input type="number" id="elec-abo" class="calc-trigger input-style" placeholder="0.00" step="0.01"></div>
+            <div><label>Services/mois (€) :</label><input type="number" id="elec-services" class="calc-trigger input-style" placeholder="0.00" step="0.01"></div>
+        </div>
+        <div id="elec-table-container" class="hidden table-scroll"><table id="elec-calc-table" class="calc-table"></table></div>
+    </div>
+
+    <div id="block-gas" class="energy-block hidden">
+        <h4 class="energy-title gas-title">🔥 Gaz</h4>
+        <div class="form-group grid-2">
+            <div><label>Abo. Annuel (€) :</label><input type="number" id="gas-abo" class="calc-trigger input-style" placeholder="0.00" step="0.01"></div>
+            <div><label>Services/mois (€) :</label><input type="number" id="gas-services" class="calc-trigger input-style" placeholder="0.00" step="0.01"></div>
+        </div>
+        <div class="table-scroll"><table id="gas-calc-table" class="calc-table"></table></div>
+    </div>
+
+    <div id="global-result-section" class="hidden">
+        <div class="deduction-box">
+            <label class="deduction-label">Total des échéances déjà perçues (Global) € :</label>
+            <input type="number" id="global-payments" class="calc-trigger input-style" placeholder="Montant total prélevé" step="0.01">
+        </div>
+        <div class="result-box">
+            <h4 class="result-title">Solde de régularisation estimé :</h4>
+            <div style="text-align:center;"><span id="total-display" class="total-amount">0.00 €</span><br><span id="detail-display" class="total-detail">...</span></div>
+            <p class="result-warning">⚠️ Estimation indicative.</p>
+        </div>
+    </div>
+</div>
+
+<style>
+    .module-wrapper { width: 100%; box-sizing: border-box; }
+    /* Style robuste pour les inputs */
+    .input-style { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; min-width: 0; }
+    .bold-select { font-weight: bold; }
+    
+    /* Grille simple 50/50 qui ne casse pas */
+    .config-grid-simple, .grid-2 { display: flex; gap: 15px; }
+    .config-item, .grid-2 > div { flex: 1; min-width: 0; } /* min-width: 0 empeche le flex item de deborder */
+
+    .config-box { background: #e9ecef; border: 1px solid #adb5bd; padding: 15px; border-radius: 4px; margin-bottom: 20px; }
+    .small-label { font-size: 0.85em; color: #555; margin-bottom: 5px; display: block; }
+
+    .energy-block { margin-top: 20px; padding: 15px; background: #fff; border: 1px solid #ddd; border-radius: 8px; }
+    .energy-title { margin: 0 0 15px 0; border-bottom: 2px solid; padding-bottom: 5px; }
+    .elec-title { color: #0047a0; border-color: #0047a0; } .gas-title { color: #e67e22; border-color: #e67e22; }
+    
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; margin-bottom: 5px; font-weight: 600; }
+
+    .table-scroll { overflow-x: auto; margin-top: 10px; border: 1px solid #eee; }
+    .calc-table { width: 100%; border-collapse: collapse; font-size: 0.9em; }
+    .calc-table th, .calc-table td { border: 1px solid #ccc; padding: 5px; text-align: center; }
+    .calc-table th { background: #eee; white-space: nowrap; }
+    .calc-table input { width: 60px; text-align: right; }
+
+    .deduction-box { margin-top: 15px; padding: 10px; background-color: #fff3cd; border: 1px solid #ffeeba; border-radius: 4px; }
+    .result-box { margin-top: 20px; padding: 15px; background: #e6ffed; border: 1px solid #28a745; border-radius: 6px; }
+    .result-title { margin: 0 0 10px 0; text-align: center; }
+    .total-amount { font-size: 1.6em; font-weight: bold; color: #333; }
+    .total-detail { font-size: 0.9em; color: #666; }
+    .result-warning { font-size: 0.8em; color: #555; text-align: center; margin-top: 10px; }
+</style>
+
+<script>
+(function(){
+    // --- DATA ---
+    const dataTRV = { "Tarif Bleu": [ { label: "Base", cols: 1, names: ["Base"] }, { label: "HC/HP", cols: 2, names: ["HC", "HP"] }, { label: "Tempo", cols: 6, names: ["HC Bleu", "HP Bleu", "HC Blanc", "HP Blanc", "HC Rouge", "HP Rouge"] } ] };
+    const dataOM = {
+        "Vert Électrique": [ { label: "Base", cols: 1, names: ["Base"] }, { label: "HC/HP", cols: 2, names: ["HC", "HP"] } ],
+        "Vert Électrique Week-End": [ { label: "Base (Sem/WE)", cols: 2, names: ["Sem", "WE"] }, { label: "HC/HP (Sem/WE)", cols: 4, names: ["HC S", "HP S", "HC WE", "HP WE"] } ],
+        "Vert Électrique Auto": [ { label: "HC/HP", cols: 2, names: ["HC", "HP"] } ],
+        "Vert Électrique Régional": [ { label: "Base", cols: 1, names: ["Base"] }, { label: "HC/HP", cols: 2, names: ["HC", "HP"] } ],
+        "Zen Week-End": [ { label: "Base (Sem/WE)", cols: 2, names: ["Sem", "WE"] }, { label: "HC/HP (Sem/WE)", cols: 4, names: ["HC S", "HP S", "HC WE", "HP WE"] } ],
+        "Zen Week-End Plus": [ { label: "Base", cols: 3, names: ["Sem", "WE", "Bon"] }, { label: "HC/HP", cols: 6, names: ["HC S", "HP S", "HC WE", "HP WE", "HC B", "HP B"] } ],
+        "Zen Flex": [ { label: "Flex", cols: 4, names: ["HC Norm", "HP Norm", "HC Sob", "HP Sob"] } ],
+        "Zen Fixe": [ { label: "Base", cols: 1, names: ["Base"] }, { label: "HC/HP", cols: 2, names: ["HC", "HP"] } ]
+    };
+
+    // --- SELECTEURS ---
+    const energyTypeSel = document.getElementById('global-energy-type');
+    const dateInput = document.getElementById('global-date');
+    const resultSection = document.getElementById('global-result-section');
+    
+    // Elec
+    const blockElec = document.getElementById('block-elec');
+    const univSel = document.getElementById('elec-universe');
+    const offerCont = document.getElementById('elec-offer-container');
+    const offerSel = document.getElementById('elec-offer-type');
+    const optCont = document.getElementById('elec-option-container');
+    const optSel = document.getElementById('elec-option-select');
+    const tableElecCont = document.getElementById('elec-table-container');
+    const tableElec = document.getElementById('elec-calc-table');
+    
+    // Gas
+    const blockGas = document.getElementById('block-gas');
+    const tableGas = document.getElementById('gas-calc-table');
+
+    // Calculs
+    const totalDisplay = document.getElementById('total-display');
+    const detailDisplay = document.getElementById('detail-display');
+
+    // --- LOGIQUE ---
+    energyTypeSel.addEventListener('change', updateVisibility);
+    dateInput.addEventListener('change', updateTables);
+
+    function updateVisibility() {
+        const type = energyTypeSel.value;
+        blockElec.classList.add('hidden'); blockGas.classList.add('hidden'); resultSection.classList.add('hidden');
+        if (type === 'ELEC' || type === 'BI') blockElec.classList.remove('hidden');
+        if (type === 'GAZ' || type === 'BI') blockGas.classList.remove('hidden');
+        if (type) resultSection.classList.remove('hidden');
+        updateTables(); calculateGlobal();
+    }
+
+    univSel.addEventListener('change', function() {
+        offerSel.innerHTML = ""; optSel.innerHTML = "";
+        offerCont.classList.add('hidden'); optCont.classList.add('hidden'); tableElecCont.classList.add('hidden');
+        if(this.value === 'TRV') { loadOptions('TRV', 'Tarif Bleu'); }
+        else if (this.value === 'OM') {
+            offerCont.classList.remove('hidden');
+            const def = document.createElement('option'); def.text="-- Choisir Offre --"; def.value=""; offerSel.add(def);
+            for(const key in dataOM) { const opt=document.createElement('option'); opt.value=key; opt.text=key; offerSel.add(opt); }
+        }
+    });
+
+    offerSel.addEventListener('change', function() { loadOptions('OM', this.value); });
+
+    function loadOptions(univ, offerName) {
+        optSel.innerHTML = ""; optCont.classList.add('hidden'); tableElecCont.classList.add('hidden');
+        const list = (univ === 'TRV') ? dataTRV[offerName] : dataOM[offerName];
+        if(list) {
+            optCont.classList.remove('hidden');
+            const def = document.createElement('option'); def.text="-- Option --"; def.value=""; optSel.add(def);
+            list.forEach((opt, i) => { const el=document.createElement('option'); el.value=i; el.text=opt.label; optSel.add(el); });
+        }
+    }
+
+    optSel.addEventListener('change', updateTables);
+
+    function updateTables() {
+        const dateVal = dateInput.value;
+        if (!dateVal) return;
+
+        if (!blockElec.classList.contains('hidden') && optSel.value !== "") {
+            const univ = univSel.value;
+            const offerName = (univ === 'TRV') ? 'Tarif Bleu' : offerSel.value;
+            const list = (univ === 'TRV') ? dataTRV[offerName] : dataOM[offerName];
+            const config = list[optSel.value];
+            generateSingleTable(tableElec, config.names, config.cols, dateVal, 'elec');
+            tableElecCont.classList.remove('hidden');
+        } else { tableElecCont.classList.add('hidden'); }
+
+        if (!blockGas.classList.contains('hidden')) {
+            generateSingleTable(tableGas, ["Conso"], 1, dateVal, 'gas');
+        }
+        document.querySelectorAll('.calc-trigger').forEach(el => el.addEventListener('input', calculateGlobal));
+    }
+
+    function generateSingleTable(tableEl, colNames, nbCols, dateVal, prefix) {
+        tableEl.innerHTML = "";
+        let th = `<tr><th style="width:100px;">Mois</th>`;
+        colNames.forEach((n, i) => th += `<th>${n}<br><input type="number" class="calc-trigger rate-input" data-prefix="${prefix}" data-col="${i}" placeholder="cts/kWh"></th>`);
+        th += `</tr>`;
+        tableEl.innerHTML += th;
+        const parts = dateVal.split('-');
+        const endDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, 1);
+        const startDate = new Date(endDate); startDate.setMonth(endDate.getMonth() - 11);
+
+        for(let i=0; i<12; i++) {
+            const current = new Date(startDate);
+            current.setMonth(startDate.getMonth() + i);
+            const label = current.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+            let row = `<tr><td style="text-align:left; padding-left:10px; text-transform:capitalize;">${label}</td>`;
+            for(let c=0; c<nbCols; c++) { row += `<td><input type="number" class="calc-trigger conso-input" data-prefix="${prefix}" data-col="${c}" placeholder="kWh"></td>`; }
+            row += `</tr>`;
+            tableEl.innerHTML += row;
+        }
+    }
+
+    function calculateGlobal() {
+        const type = energyTypeSel.value;
+        const payments = parseFloat(document.getElementById('global-payments').value) || 0;
+        let totalCost = 0;
+
+        if (type === 'ELEC' || type === 'BI') {
+            const abo = parseFloat(document.getElementById('elec-abo').value) || 0;
+            const serv = parseFloat(document.getElementById('elec-services').value) || 0;
+            totalCost += abo + (serv * 12);
+            const rates = {};
+            document.querySelectorAll(`.rate-input[data-prefix="elec"]`).forEach(i => rates[i.dataset.col] = (parseFloat(i.value)||0)/100);
+            document.querySelectorAll(`.conso-input[data-prefix="elec"]`).forEach(i => { totalCost += (parseFloat(i.value)||0) * (rates[i.dataset.col]||0); });
+        }
+
+        if (type === 'GAZ' || type === 'BI') {
+            const abo = parseFloat(document.getElementById('gas-abo').value) || 0;
+            const serv = parseFloat(document.getElementById('gas-services').value) || 0;
+            totalCost += abo + (serv * 12);
+            const rate = (parseFloat(document.querySelector(`.rate-input[data-prefix="gas"]`)?.value)||0)/100;
+            document.querySelectorAll(`.conso-input[data-prefix="gas"]`).forEach(i => { totalCost += (parseFloat(i.value)||0) * rate; });
+        }
+
+        const final = totalCost - payments;
+        let color = "#333"; let sign = "";
+        if(final > 0) { color = "#dc3545"; sign="+"; } else if(final < 0) { color = "#28a745"; }
+        totalDisplay.textContent = `${sign}${final.toFixed(2)} €`;
+        totalDisplay.style.color = color;
+        detailDisplay.textContent = `(Coût Énergie: ${totalCost.toFixed(2)}€ - Acomptes: ${payments.toFixed(2)}€)`;
+
+        let labelType = (type==='BI') ? 'Bi-énergie' : type;
+        window.traceAction = `Simulation Régul ${labelType}. Coût sur un an: ${totalCost.toFixed(2)}€. Versements sur un an: ${payments.toFixed(2)}€. Solde: ${final.toFixed(2)}€.`;
+    }
+
+    window.currentModuleCleanup = function() { window.traceAction = ""; };
+})();
+</script>

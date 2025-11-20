@@ -1,0 +1,208 @@
+<div class="module-wrapper">
+    <h3 class="module-title">🔄 Changement d'Offre</h3>
+
+    <div class="form-group config-box">
+        <div class="config-grid">
+            <div>
+                <label class="small-label">Offre ACTUELLE :</label>
+                <select id="current-universe" class="full-width bold-select">
+                    <option value="">-- Univers --</option>
+                    <option value="TRV">TRV</option>
+                    <option value="OM">OM</option>
+                </select>
+            </div>
+            <div>
+                <label class="small-label">NOUVELLE offre :</label>
+                <select id="new-universe" class="full-width bold-select">
+                    <option value="">-- Univers --</option>
+                    <option value="TRV">TRV</option>
+                    <option value="OM">OM</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div id="alert-mes" class="hidden" style="margin: 15px 0;">
+        <div style="background-color: #fff3cd; border: 1px solid #ffeeba; color: #856404; padding: 15px; border-radius: 4px; text-align: center;">
+            <strong>⚠️ Changement d'Univers tarifaire</strong><br>
+            Le client doit être orienté vers la Mise en Service.
+        </div>
+        <div style="margin-top: 10px;">
+            <label style="cursor:pointer;">
+                <input type="checkbox" id="check-transfert-mes"> 
+                <strong>Je transfère le client à la Mise en Service.</strong>
+            </label>
+        </div>
+    </div>
+
+    <div id="offer-selection-section" class="hidden">
+        <div class="form-group">
+            <div class="config-grid">
+                <div>
+                    <label>Type d'offre actuelle :</label>
+                    <select id="current-offer" class="full-width"></select>
+                </div>
+                <div>
+                    <label>Nouvelle offre souhaitée :</label>
+                    <select id="new-offer" class="full-width"></select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="alert-same-offer" class="hidden" style="margin: 15px 0;">
+        <div style="background-color: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; padding: 15px; border-radius: 4px; text-align: center;">
+            <strong>ℹ️ Offre Identique</strong><br>
+            Pour une souscription à l'identique, orienter vers la MES.
+        </div>
+        <div style="margin-top: 10px;">
+            <label style="cursor:pointer;">
+                <input type="checkbox" id="check-transfert-mes-same"> 
+                <strong>Je transfère le client à la Mise en Service.</strong>
+            </label>
+        </div>
+    </div>
+
+    <div id="dat-section" class="hidden" style="margin-top: 15px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; background: #f9f9f9;">
+        <label style="cursor:pointer; color: #0047a0; font-weight: bold;">
+            <input type="checkbox" id="check-dat"> 
+            Je ne suis pas formé facture-conseil : Je fais une DAT à 7 jours.
+        </label>
+    </div>
+
+</div>
+
+<style>
+    .module-wrapper * { box-sizing: border-box; }
+    .full-width { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+    .config-box { background: #f8f9fa; padding: 15px; border-radius: 4px; border: 1px solid #ddd; margin-bottom: 15px; }
+    .config-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    .small-label { font-size: 0.85em; color: #555; display: block; margin-bottom: 4px; }
+    .bold-select { font-weight: bold; }
+</style>
+
+<script>
+(function(){
+    // DONNÉES
+    const offerTypes = {
+        "TRV": ["Base", "Heures Creuses", "Tempo"],
+        "OM": ["Vert Électrique", "Vert Électrique Auto", "Vert Électrique Week-End", "Vert Électrique Régional", "Zen Week-End", "Zen Week-End Plus", "Zen Fixe", "Zen Flex", "Zen Online"]
+    };
+
+    // DOM Elements
+    const currUniv = document.getElementById('current-universe');
+    const newUniv = document.getElementById('new-universe');
+    
+    const alertMES = document.getElementById('alert-mes');
+    const checkTransMES = document.getElementById('check-transfert-mes');
+    
+    const offerSection = document.getElementById('offer-selection-section');
+    const currOffer = document.getElementById('current-offer');
+    const newOffer = document.getElementById('new-offer');
+    
+    const alertSame = document.getElementById('alert-same-offer');
+    const checkTransSame = document.getElementById('check-transfert-mes-same');
+    
+    const datSection = document.getElementById('dat-section');
+    const checkDAT = document.getElementById('check-dat');
+
+    // Listeners
+    currUniv.addEventListener('change', validateUniverse);
+    newUniv.addEventListener('change', validateUniverse);
+    currOffer.addEventListener('change', checkOffers);
+    newOffer.addEventListener('change', checkOffers);
+    
+    // Checkbox listeners for Trace
+    [checkTransMES, checkTransSame, checkDAT].forEach(el => el.addEventListener('change', generateTrace));
+
+    function validateUniverse() {
+        // Reset UI
+        alertMES.classList.add('hidden');
+        offerSection.classList.add('hidden');
+        alertSame.classList.add('hidden');
+        datSection.classList.add('hidden');
+        checkTransMES.checked = false;
+        checkTransSame.checked = false;
+        checkDAT.checked = false;
+
+        const u1 = currUniv.value;
+        const u2 = newUniv.value;
+
+        if(!u1 || !u2) { window.traceAction = ""; return; }
+
+        if(u1 !== u2) {
+            // Univers différents -> MES
+            alertMES.classList.remove('hidden');
+        } else {
+            // Même univers -> Choix offres
+            offerSection.classList.remove('hidden');
+            populateSelect(currOffer, offerTypes[u1]);
+            populateSelect(newOffer, offerTypes[u2]); // u1 == u2
+        }
+        generateTrace();
+    }
+
+    function populateSelect(select, options) {
+        select.innerHTML = '<option value="">-- Sélectionner --</option>';
+        options.forEach(opt => {
+            const el = document.createElement('option');
+            el.value = opt; el.text = opt;
+            select.add(el);
+        });
+    }
+
+    function checkOffers() {
+        alertSame.classList.add('hidden');
+        datSection.classList.add('hidden');
+        checkTransSame.checked = false;
+        checkDAT.checked = false;
+
+        const o1 = currOffer.value;
+        const o2 = newOffer.value;
+
+        if(o1 && o2) {
+            if(o1 === o2) {
+                alertSame.classList.remove('hidden');
+            } else {
+                datSection.classList.remove('hidden');
+            }
+        }
+        generateTrace();
+    }
+
+    function generateTrace() {
+        const u1 = currUniv.value;
+        const u2 = newUniv.value;
+        
+        if(!u1 || !u2) { window.traceAction = ""; return; }
+
+        let txt = "";
+
+        if (u1 !== u2) {
+            txt = `Demande changement offre ${u1} vers ${u2}. `;
+            if(checkTransMES.checked) txt += "Client transféré vers Mise en Service.";
+            else txt += "Client orienté vers 3404 (Changement univers).";
+        } else {
+            const o1 = currOffer.value;
+            const o2 = newOffer.value;
+            if(o1 && o2) {
+                if(o1 === o2) {
+                    txt = `Demande souscription offre identique (${o1}). `;
+                    if(checkTransSame.checked) txt += "Transféré vers Mise en Service.";
+                    else txt += "Orienté vers 3404.";
+                } else {
+                    txt = `Changement d'offre : ${o1} vers ${o2}.`;
+                    if(checkDAT.checked) txt += " (Non formé Facture-Conseil : DAT effectuée).";
+                }
+            } else {
+                 txt = `Consultation changement d'offre ${u1}.`;
+            }
+        }
+        
+        window.traceAction = txt;
+    }
+
+    // Cleanup
+    window.currentModuleCleanup = function() { window.traceAction = ""; };
+})();
+</script>

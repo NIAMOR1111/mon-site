@@ -1,0 +1,244 @@
+<div class="module-wrapper">
+    <h3 class="module-title">⚠️ Diagnostic Panne & Urgence</h3>
+
+    <div class="form-group config-box">
+        <label style="font-weight:bold;">Énergie concernée :</label>
+        <select id="panne-energy" class="input-force">
+            <option value="">-- Sélectionner --</option>
+            <option value="electricite">Électricité</option>
+            <option value="gaz">Gaz</option>
+        </select>
+    </div>
+
+    <div id="advisor-note" class="advisor-box hidden">
+        <strong>ℹ️ Note Conseiller :</strong><br>
+        Vérifiez sur l'outil distributeur si le contrat est actif et si une coupure est déjà déclarée.<br>
+        <a id="distributor-link" href="#" target="_blank" class="distributor-btn">Ouvrir le site Info-Coupure</a>
+    </div>
+
+    <div id="elec-section" class="hidden">
+        
+        <div class="form-group" style="margin-top:15px; background:#f9f9f9; padding:10px; border-radius:4px;">
+            <label>Type de panne :</label>
+            <div style="display:flex; gap:20px; margin-top:5px;">
+                <label style="cursor:pointer;"><input type="radio" name="elec-type" value="permanent"> Coupure Franche (Permanente)</label>
+                <label style="cursor:pointer;"><input type="radio" name="elec-type" value="intermittent"> Coupure Intermittente / Baisse tension</label>
+            </div>
+        </div>
+
+        <div id="elec-diag-permanent" class="diag-box hidden">
+            <h4>🔍 Diagnostic (Panne Permanente) :</h4>
+            <ul class="check-list">
+                <li>Si <strong>Nouveau Contrat</strong> : Vérifier conformité PDL/PRM.</li>
+                <li>Si <strong>Nouveau Contrat + Linky</strong> : Rester appuyé 10 sec sur le bouton (+) pour enclencher.</li>
+                <li>Vérifier que le <strong>disjoncteur général</strong> est bien enclenché (Position I).</li>
+                <li>Tester une prise dans une autre pièce ou un autre appareil.</li>
+                <li>Vérifier si le <strong>voisinage</strong> ou l'éclairage public a du courant.</li>
+            </ul>
+        </div>
+
+        <div id="elec-diag-intermittent" class="diag-box hidden">
+            <h4>🔍 Diagnostic (Panne Intermittente) :</h4>
+            <p style="font-size:0.9em; color:#555; margin-bottom:10px;">Veuillez préciser les conditions d'apparition :</p>
+            
+            <div class="form-group">
+                <label>Fréquence (ex: tous les jours, aléatoire...) :</label>
+                <input type="text" id="elec-freq" class="input-force" placeholder="Saisir fréquence...">
+            </div>
+            <div class="form-group">
+                <label>Moment / Contexte (ex: quand j'allume le four...) :</label>
+                <input type="text" id="elec-context" class="input-force" placeholder="Saisir contexte...">
+            </div>
+        </div>
+
+    </div>
+
+    <div id="gas-section" class="hidden">
+        <div class="diag-box" style="border-left-color: #e67e22;">
+            <h4 style="color:#e67e22;">🔥 Diagnostic Gaz :</h4>
+            <ul class="check-list">
+                <li style="color:#dc3545; font-weight:bold; background:#fff0f0; padding:5px;">⚠️ SÉCURITÉ : Si odeur de gaz, ouvrir les fenêtres, sortir et appeler Urgence Gaz immédiatement.</li>
+                <li>Vérifier si le <strong>robinet d'arrivée de gaz</strong> est bien ouvert.</li>
+                <li>Vérifier si la chaudière n'est pas en mode sécurité (code erreur ?) ou en mode "Été" (eau chaude seule).</li>
+                <li>Tester la gazinière (si présente) pour confirmer l'arrivée du gaz.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="resolution-section" class="hidden" style="margin-top: 25px; border-top: 2px solid #eee; padding-top: 15px;">
+        <label style="font-weight:bold; display:block; margin-bottom:10px;">Bilan de l'appel :</label>
+        
+        <div class="resolution-options">
+            <div class="res-option">
+                <input type="radio" name="resolution" id="res-depannage" value="depannage">
+                <label for="res-depannage">
+                    <strong>Orienter vers le Dépannage</strong><br>
+                    <span id="depannage-number" style="color:#d63384; font-weight:bold;">...</span>
+                </label>
+            </div>
+
+            <div class="res-option">
+                <input type="radio" name="resolution" id="res-resolu" value="resolu">
+                <label for="res-resolu">
+                    <strong>Problème résolu en ligne</strong><br>
+                    <span style="color:#28a745;">Le diagnostic a permis de rétablir l'énergie.</span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<style>
+    .module-wrapper * { box-sizing: border-box; }
+    .input-force { width: 100% !important; height: 40px !important; padding: 6px 10px !important; border: 1px solid #ccc !important; border-radius: 4px !important; box-sizing: border-box !important; display: block !important; }
+    
+    .config-box { background: #f8f9fa; padding: 15px; border: 1px solid #ddd; border-radius: 4px; }
+    
+    .advisor-box { margin-top: 15px; padding: 10px; background-color: #fff3cd; border: 1px solid #ffeeba; border-radius: 4px; color: #856404; font-size: 0.95em; }
+    .distributor-btn { display: inline-block; margin-top: 5px; background: #ffc107; color: #000; text-decoration: none; padding: 5px 10px; border-radius: 4px; font-weight: bold; font-size: 0.9em; }
+    .distributor-btn:hover { background: #e0a800; }
+
+    .diag-box { margin-top: 15px; background-color: #eef; padding: 15px; border-left: 4px solid #0047a0; border-radius: 4px; animation: fadeIn 0.5s; }
+    .diag-box h4 { margin-top: 0; margin-bottom: 10px; color: #333; }
+    
+    .check-list { padding-left: 20px; margin: 0; }
+    .check-list li { margin-bottom: 8px; line-height: 1.4; }
+
+    .resolution-options { display: flex; flex-direction: column; gap: 10px; }
+    .res-option { display: flex; align-items: flex-start; gap: 10px; padding: 10px; border: 1px solid #ddd; border-radius: 6px; cursor: pointer; transition: background 0.2s; }
+    .res-option:hover { background-color: #f9f9f9; }
+    .res-option input { margin-top: 5px; transform: scale(1.2); }
+    .res-option label { cursor: pointer; width: 100%; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+
+<script>
+(function(){
+    // Data
+    const data = {
+        "electricite": {
+            num: "09 72 67 50 XX (Enedis)",
+            link: "https://www.enedis.fr/panne-et-interruption",
+            label: "Enedis"
+        },
+        "gaz": {
+            num: "0 800 47 33 33 (GRDF)",
+            link: "https://infocoupure.grdf.fr/icfo-gpublic",
+            label: "GRDF"
+        }
+    };
+
+    // Elements
+    const energySel = document.getElementById('panne-energy');
+    const advisorNote = document.getElementById('advisor-note');
+    const distLink = document.getElementById('distributor-link');
+    
+    const elecSection = document.getElementById('elec-section');
+    const elecRadios = document.getElementsByName('elec-type');
+    const diagPerm = document.getElementById('elec-diag-permanent');
+    const diagInter = document.getElementById('elec-diag-intermittent');
+    const elecFreq = document.getElementById('elec-freq');
+    const elecContext = document.getElementById('elec-context');
+
+    const gasSection = document.getElementById('gas-section');
+    
+    const resSection = document.getElementById('resolution-section');
+    const depNumDisplay = document.getElementById('depannage-number');
+    const resRadios = document.getElementsByName('resolution');
+
+    // --- LOGIQUE ENERGIE ---
+    energySel.addEventListener('change', function() {
+        const val = this.value;
+        
+        // Reset global
+        elecSection.classList.add('hidden');
+        gasSection.classList.add('hidden');
+        advisorNote.classList.add('hidden');
+        resSection.classList.add('hidden');
+        diagPerm.classList.add('hidden');
+        diagInter.classList.add('hidden');
+        
+        // Reset radios
+        elecRadios.forEach(r => r.checked = false);
+        resRadios.forEach(r => r.checked = false);
+
+        if(val) {
+            // Update Note Conseiller
+            distLink.href = data[val].link;
+            advisorNote.classList.remove('hidden');
+            
+            // Update Resolution Numéro
+            depNumDisplay.textContent = data[val].num;
+            
+            if(val === 'electricite') {
+                elecSection.classList.remove('hidden');
+            } else {
+                gasSection.classList.remove('hidden');
+                resSection.classList.remove('hidden'); // Gaz affiche direct la conclusion
+            }
+        }
+        updateTrace();
+    });
+
+    // --- LOGIQUE ELEC (Type Panne) ---
+    elecRadios.forEach(r => {
+        r.addEventListener('change', function() {
+            diagPerm.classList.add('hidden');
+            diagInter.classList.add('hidden');
+            
+            if(this.value === 'permanent') diagPerm.classList.remove('hidden');
+            if(this.value === 'intermittent') diagInter.classList.remove('hidden');
+            
+            resSection.classList.remove('hidden'); // On affiche la conclusion une fois le type choisi
+            updateTrace();
+        });
+    });
+
+    // --- LOGIQUE RESOLUTION ---
+    resRadios.forEach(r => r.addEventListener('change', updateTrace));
+    
+    // Inputs Intermittents
+    elecFreq.addEventListener('input', updateTrace);
+    elecContext.addEventListener('input', updateTrace);
+
+
+    // --- GENERATION TRACE ---
+    function updateTrace() {
+        const energy = energySel.value;
+        if(!energy) { window.traceAction = ""; return; }
+
+        let txt = `Diagnostic Panne ${energy === 'electricite' ? 'Électricité' : 'Gaz'}. `;
+        
+        // Détails Elec
+        if(energy === 'electricite') {
+            let typePanne = "";
+            elecRadios.forEach(r => { if(r.checked) typePanne = r.value; });
+            
+            if(typePanne === 'permanent') txt += "Type: Coupure Franche. ";
+            if(typePanne === 'intermittent') {
+                const f = elecFreq.value.trim();
+                const c = elecContext.value.trim();
+                txt += `Type: Intermittent/Tension. (Fréquence: ${f || '?'} | Contexte: ${c || '?'}). `;
+            }
+        }
+
+        // Résolution
+        let resolution = "";
+        resRadios.forEach(r => { if(r.checked) resolution = r.value; });
+
+        if(resolution === 'depannage') {
+            txt += `Vérifications faites -> Client orienté vers Dépannage (${data[energy].label}).`;
+        } else if(resolution === 'resolu') {
+            txt += `Vérifications faites -> Problème résolu en ligne.`;
+        } else {
+            txt += `Diagnostic en cours...`;
+        }
+
+        window.traceAction = txt;
+    }
+
+    window.currentModuleCleanup = function() { window.traceAction = ""; };
+})();
+</script>

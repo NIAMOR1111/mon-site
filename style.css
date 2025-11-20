@@ -136,3 +136,32 @@ hr { border: 0; height: 1px; background: #eee; margin: 25px 0; }
     width: 100%; height: 250px; font-family: "Courier New", Courier, monospace; font-size: 0.9em; 
     border: 1px solid #ccc; border-radius: 4px; padding: 10px; box-sizing: border-box; background-color: #f9f9f9; 
 }
+
+.part-title {
+    text-align: left;
+    color: #333;
+    font-size: 1.1em;
+    margin: 20px 0 10px 0;
+    text-transform: uppercase;
+    border-bottom: 2px solid #0047a0;
+    padding-bottom: 5px;
+}
+
+/* Style des sous-boutons (niveau 2) pour les différencier */
+.subcategory-button {
+    background-color: #fff;
+    color: #0047a0;
+    border: 1px solid #0047a0;
+    padding: 10px;
+    border-radius: 20px; /* Plus arrondi */
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+.subcategory-button:hover {
+    background-color: #eef;
+}
+.subcategory-button.active {
+    background-color: #0047a0;
+    color: white;
+}
